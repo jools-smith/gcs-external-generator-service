@@ -1,0 +1,8 @@
+/generated/
+/target/
+/pcs-migration-to-alm-generators.iml
+/revenera-gcs.zip
+/build/
+/dist/
+/${env.TOMCAT_HOME}/
+/Test/.vs/

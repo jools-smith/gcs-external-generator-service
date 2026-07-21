@@ -15,7 +15,7 @@
     <property name="schema-loc" location="${BASE}/schema" />
     <property name="warfile" location="${BASE}/revenera-gcs.war" />
     <property name="zipped-sources" location="${BASE}/revenera-gcs.zip" />
-
+    <property name="repository" location="${BASE}/repository" />
     <property name="build.props" location="build.properties" />
 
     <target name="init-buildnumber">
@@ -125,10 +125,9 @@ app.housekeeping=10
     </target>
 
     <target name="deploy" depends="build">
-        <copy tofile="${env.TOMCAT_HOME}/webapps/licgen.war" file="${warfile}" />
+        <copy todir="${repository}" file="${warfile}" />
         <echo message="" />
-        <echo
-            message="Once the tomcat is running, the services can be connected from FNO using http://server:port/licgen/services/LicenseGeneratorService, where licgen is the context root." />
+        <echo message="http://server:port/revenera-gcs/services/LicenseGeneratorService" />
     </target>
 
     <target name="clean" description="clean up">
@@ -138,5 +137,6 @@ app.housekeeping=10
         <delete dir="${dist}" />
         <delete dir="${generated-src}" />
         <delete dir="${generated}" />
+        <delete dir="${repository}" />
     </target>
 </project>

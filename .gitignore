@@ -6,3 +6,4 @@
 /dist/
 /${env.TOMCAT_HOME}/
 /Test/.vs/
+/repository/

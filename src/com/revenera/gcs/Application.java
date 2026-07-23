@@ -2,12 +2,13 @@ package com.revenera.gcs;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.GeneratorBase;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.AnnotationManager;
-import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Utils;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.transaction.DiagnosticsFactory;
+import com.revenera.gcs.utils.AnnotationManager;
+import com.revenera.gcs.transaction.ExecutionScope;
+import com.revenera.gcs.utils.GeneratorImplementor;
+import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
 import javax.servlet.*;
@@ -40,7 +41,7 @@ public class Application implements
   static {
     try {
       final Level level = Level.valueOf(
-          Beans.applicationProperties.getLoggingLevel().toUpperCase());
+          Beans.getApplicationProperties().getLoggingLevel().toUpperCase());
 
       LoggingFactory.setLoggingLevel(level);
 
@@ -56,7 +57,7 @@ public class Application implements
     try {
       logger.me(this);
 
-      logger.info().log("version", Beans.applicationProperties.getVersionDetails());
+      logger.info().log("version", Beans.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -89,14 +90,14 @@ public class Application implements
   }
 
   private void polling() {
-    try (final DiagnosticsFactory.ExecutionContext context = Beans.diagnosticsFactory.makeExecutionContext()) {
-      while (Beans.diagnosticsFactory.hasTransactions()) {
+    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
+      while (Beans.getDiagnosticsFactory().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
-        final DiagnosticsFactory.TransactionRecord content = Beans.diagnosticsFactory.pollTransactions();
+        final DiagnosticsFactory.TransactionRecord content = Beans.getDiagnosticsFactory().pollTransactions();
         if (content != null) {
           serializeToLogPath(content.key + ".json",
               Collections.singletonList(
-                  Utils.safeSerializeJsonIndented(content)));
+                  Serializer.safeSerializeJsonIndented(content)));
         }
       }
     }
@@ -106,7 +107,7 @@ public class Application implements
   }
 
   private void logging() {
-    try (final DiagnosticsFactory.ExecutionContext context = Beans.diagnosticsFactory.makeExecutionContext()) {
+    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
 
       final List<String> messages = new ArrayList<>();
       while (LoggingFactory.hasMessages()) {
@@ -123,9 +124,9 @@ public class Application implements
   }
 
   private void housekeeping() {
-    try (final DiagnosticsFactory.ExecutionContext context = Beans.diagnosticsFactory.makeExecutionContext()) {
+    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
       //TODO:what is this supposed to do?
-      logger.yaml(Level.DEBUG, Beans.diagnosticsFactory.getRecords());
+      logger.yaml(Level.DEBUG, Beans.getDiagnosticsFactory().getRecords());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -166,12 +167,12 @@ public class Application implements
 
             imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 
-            Beans.implementorFactory.addImplementor(imp, annotation.isDefault());
+            Beans.getImplementorFactory().addImplementor(imp, annotation.isDefault());
           }
         }
       }
 
-      final LicenseGeneratorServiceInterface implementor = Beans.implementorFactory.getDefaultImplementor();
+      final LicenseGeneratorServiceInterface implementor = Beans.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {
         logger.info().log("default implementor", implementor.getClass().getName());
       }
@@ -181,7 +182,7 @@ public class Application implements
 
       this.housekeeper.initialize();
 
-      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, Beans.applicationProperties.getHousekeepingFrequency(), TimeUnit.MINUTES);
+      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, Beans.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
       this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
       this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
     }

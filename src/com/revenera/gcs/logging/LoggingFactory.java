@@ -1,7 +1,6 @@
 package com.revenera.gcs.logging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.revenera.gcs.utils.Utils;
+import com.revenera.gcs.utils.Serializer;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -153,16 +152,11 @@ public class LoggingFactory {
   }
 
   public void in(final Object obj) {
-    try {
-      new SimpleLoggingImplementor(
-          new Context(Level.TRACE, new Throwable().getStackTrace()[1])).log(
-          "-->",
-          obj.getClass().getName(),
-          Utils.yaml_mapper.writeValueAsString(obj));
-    }
-    catch (final JsonProcessingException e) {
-      exception(e);
-    }
+    new SimpleLoggingImplementor(
+        new Context(Level.TRACE, new Throwable().getStackTrace()[1])).log(
+        "-->",
+        obj.getClass().getName(),
+        Serializer.safeSerializeYaml(obj));
   }
 
   public void out() {
@@ -171,27 +165,17 @@ public class LoggingFactory {
   }
 
   public void json(final Level level, final Object obj) {
-    try {
-      new SimpleLoggingImplementor(
-          new Context(level, new Throwable().getStackTrace()[1])).log(
-              obj.getClass().getName(),
-              Utils.json_mapper_indented.writeValueAsString(obj));
-    }
-    catch (final JsonProcessingException e) {
-      exception(e);
-    }
+    new SimpleLoggingImplementor(
+        new Context(level, new Throwable().getStackTrace()[1])).log(
+        obj.getClass().getName(),
+        Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
-    try {
-      new SimpleLoggingImplementor(
-          new Context(level, new Throwable().getStackTrace()[1])).log(
-            obj.getClass().getName(),
-            Utils.yaml_mapper.writeValueAsString(obj));
-    }
-    catch (final JsonProcessingException e) {
-      exception(e);
-    }
+    new SimpleLoggingImplementor(
+        new Context(level, new Throwable().getStackTrace()[1])).log(
+        obj.getClass().getName(),
+        Serializer.safeSerializeYaml(obj));
   }
 
   public void me(final Object obj) {

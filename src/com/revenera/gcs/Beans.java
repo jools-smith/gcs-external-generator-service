@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public class Beans {
@@ -30,12 +31,20 @@ public class Beans {
     return Paths.get(web_inf, parts);
   }
 
-  public static final ApplicationProiperties applicationProperties = new ApplicationProiperties();
+  private static final ApplicationProiperties applicationProperties = new ApplicationProiperties();
+  public static ApplicationProiperties getApplicationProperties() {
+    return applicationProperties;
+  }
 
-  public final static ImplementorFactory implementorFactory = new ImplementorFactory();
+  private final static ImplementorFactory implementorFactory = new ImplementorFactory();
+  public static ImplementorFactory getImplementorFactory() {
+    return implementorFactory;
+  }
 
-  public final static DiagnosticsFactory diagnosticsFactory = new DiagnosticsFactory();
-
+  private final static DiagnosticsFactory diagnosticsFactory = new DiagnosticsFactory();
+  public static DiagnosticsFactory getDiagnosticsFactory() {
+    return diagnosticsFactory;
+  }
   public static Path getLogPath() {
     return Paths.get(web_inf, "logs");
   }
@@ -44,7 +53,7 @@ public class Beans {
     return Duration.between(started, Instant.now());
   }
 
-  public static Object getApplicationData() {
+  public static Map<String,Object> getApplicationData() {
 
     return new LinkedHashMap<String, Object>() {
       {

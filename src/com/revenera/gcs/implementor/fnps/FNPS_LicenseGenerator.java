@@ -5,9 +5,9 @@ import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorResources;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
 import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Utils;
+import com.revenera.gcs.utils.Serializer;
+import com.revenera.gcs.transaction.TransactionScope;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -33,7 +33,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
       final GeneratorResources res = new GeneratorResources(technologyId());
 
       final Path executablePath = res.getExecutablePath("hbk-signer.exe");
@@ -69,7 +69,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
         }
       };
 
-      final String json = Utils.json_mapper.writeValueAsString(payload);
+      final String json = Serializer.safeSerializeJson(payload);
       logger.debug().log("payload %s", json);
 
       Files.write(inputLicenseFilePath.toAbsolutePath(), json.getBytes());
@@ -122,7 +122,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
       return new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();

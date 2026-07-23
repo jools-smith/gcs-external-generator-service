@@ -4,16 +4,16 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.Beans;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.Utils;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.utils.Serializer;
+import com.revenera.gcs.transaction.TransactionContext;
+import com.revenera.gcs.transaction.TransactionScope;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class GeneratorBase implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
@@ -88,13 +88,14 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
 
   private PingResponse doMiniPingResponse() {
+
     return new PingResponse() {
       {
         this.str = String.join(" | ",
             "GCS External Generator Service",
-            Beans.applicationProperties.getVersion(),
-            Beans.applicationProperties.getDate(),
-            Beans.applicationProperties.getTime());
+            Beans.getApplicationProperties().getVersion(),
+            Beans.getApplicationProperties().getDate(),
+            Beans.getApplicationProperties().getTime());
 
         this.processedTime = Instant.now().toString();
         this.info = String.join(" | ",
@@ -111,7 +112,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
     try {
       return new PingResponse() {
         {
-          this.info = Utils.safeSerializeYaml(Beans.getApplicationData());
+          this.info = Serializer.safeSerializeYaml(Beans.getApplicationData());
 
           class Bag {
             final Map<String, Object> elements = new LinkedHashMap<>();
@@ -137,9 +138,9 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
           this.str = new Bag()
               .with("technology", logger.getType().getSimpleName(), technologyId())
               .with("version",
-                  Beans.applicationProperties.getVersion(),
-                  Beans.applicationProperties.getDate(),
-                  Beans.applicationProperties.getTime())
+                  Beans.getApplicationProperties().getVersion(),
+                  Beans.getApplicationProperties().getDate(),
+                  Beans.getApplicationProperties().getTime())
               .with("system",
                   SystemProperties.getOsName(),
                   SystemProperties.getOsVersion(),
@@ -169,19 +170,19 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
       logger.in();
 
-      context.add(request);
+      TransactionContext.get().add(request);
 
-      return context.add(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
+      return TransactionContext.get().add(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
     }
   }
 
   @Override
   public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       return new Status() {
         {
           this.message = "product is validated | " + request.getName() + " | " + request.getVersion();
@@ -193,8 +194,8 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       return new Status() {
         {
           this.message = "license request is validated | " + request.getName();
@@ -206,8 +207,8 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       final String license = request.getFulfillments().stream().flatMap(fulfilment -> fulfilment.getLicenseFiles().stream()).filter(lfd -> String.class.isAssignableFrom(lfd.getValue().getClass())).map(lfd -> lfd.getValue().toString()).collect(Collectors.joining("\n"));
 
       return new ConsolidatedLicense() {
@@ -227,24 +228,24 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
     }
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
     }
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
       return except(String.class, "generateCustomHostIdentifier not implemented");
     }
   }

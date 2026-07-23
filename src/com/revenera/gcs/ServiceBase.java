@@ -72,13 +72,17 @@ public abstract class ServiceBase {
     }
   }
 
-//  protected DiagnosticsFactory.ExecutionContext createExecutionContext() {
-//    return Beans.diagnosticsFactory.makeExecutionContext(1);
-//  }
+  String frameDetails(final StackTraceElement frame) {
+    return  String.join("|",
+            frame.getFileName(),
+            frame.getClassName(),
+            frame.getMethodName(),
+            java.lang.String.valueOf(frame.getLineNumber()));
+  }
 
   public Function<Throwable, SvcException> serviceException = (throwable) -> new SvcException() {
     {
-      this.setMessage(Utils.frameDetails(Thread.currentThread().getStackTrace()[3]));
+      this.setMessage(frameDetails(Thread.currentThread().getStackTrace()[3]));
       
       this.setName(throwable.getClass().getName());
     }

@@ -5,9 +5,9 @@ import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorResources;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Utils;
+import com.revenera.gcs.transaction.TransactionContext;
+import com.revenera.gcs.transaction.TransactionScope;
+import com.revenera.gcs.utils.*;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
@@ -36,8 +36,8 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
@@ -85,7 +85,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
         }
       };
 
-      final String json = Utils.json_mapper.writeValueAsString(payload);
+      final String json = Serializer.safeSerializeJson(payload);
       logger.debug().log("payload", json);
 
       // TODO: create the license file template
@@ -111,7 +111,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return context.add(GeneratorResponse.class, new GeneratorResponse() {
+        return TransactionContext.get().add(GeneratorResponse.class, new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -137,10 +137,10 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final DiagnosticsFactory.TransactionContext context = Beans.diagnosticsFactory.makeTransactionContext()) {
-      context.add(request);
+    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+      TransactionContext.get().add(request);
 
-      return context.add(ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return TransactionContext.get().add(ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 

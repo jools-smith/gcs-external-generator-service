@@ -106,9 +106,6 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
                 })).collect(Collectors.toList());
 
             this.complete = true;
-
-            // debug
-            //this.licenseFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
           }
         };
       } // file is deleted here

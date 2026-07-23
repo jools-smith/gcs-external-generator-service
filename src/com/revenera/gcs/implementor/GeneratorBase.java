@@ -3,6 +3,7 @@ package com.revenera.gcs.implementor;
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
+import com.flexnet.external.webservice.keygenerator.ServiceHelper;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Serializer;
@@ -18,16 +19,6 @@ import java.util.stream.Collectors;
 public abstract class GeneratorBase implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
   protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
-
-  @SuppressWarnings("unused")
-  static protected <T> T raiseLicGeneratorException(final Throwable t) throws LicGeneratorException {
-    throw new LicGeneratorException("unexpected exception", new SvcException() {
-      {
-        this.message = t.getMessage();
-        this.name = t.getClass().getSimpleName();
-      }
-    });
-  }
 
   protected List<LicenseFileMapItem> makeLicenseFiles(final List<LicenseFileDefinition> files, final String text, final byte[] bytes) {
     return new ArrayList<LicenseFileMapItem>() {
@@ -64,11 +55,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
   }
 
   private final Technology technology = new Technology();
-  // TECHNOLOGY PROPS
 
-//  private  DiagnosticsFactory.TransactionContext createTransaction() {
-//    return Beans.diagnosticsFactory.makeTransactionContext(1);
-//  }
 
   @Override
   public void configureTechnologyProperties(final String id, final String name) {

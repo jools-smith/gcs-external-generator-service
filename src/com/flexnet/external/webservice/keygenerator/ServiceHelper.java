@@ -14,11 +14,11 @@ public class ServiceHelper {
   }
   
   public static SvcException makeServiceException(final Throwable throwable) {
-    final StackTraceElement frame = Thread.currentThread().getStackTrace()[3];
+    final StackTraceElement frame = Thread.currentThread().getStackTrace()[2];
 
     final SvcException sex = new SvcException();
     sex.setMessage(getStackTraceElement(frame));
-    sex.setName(throwable.getClass().getName());
+    sex.setName(throwable.getClass().getSimpleName());
 
     return sex;
   }

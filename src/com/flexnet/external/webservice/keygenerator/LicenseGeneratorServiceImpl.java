@@ -33,7 +33,6 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
-//      logger.json(Level.DEBUG, payload);
 
       return Beans
           .getImplementorFactory()

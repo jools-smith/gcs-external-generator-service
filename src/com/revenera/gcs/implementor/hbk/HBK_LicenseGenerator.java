@@ -37,7 +37,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
@@ -138,7 +138,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       return TransactionContext.get().add(ConsolidatedLicense.class, new ConsolidatedLicense() {

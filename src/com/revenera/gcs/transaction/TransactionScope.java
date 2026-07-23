@@ -46,20 +46,17 @@ public class TransactionScope implements AutoCloseable {
   }
 
   @JsonIgnore
-  private DiagnosticsFactory.TransactionRecord asTransactionRecord() {
-    return new DiagnosticsFactory.TransactionRecord() {
-      {
-        this.key = TransactionScope.this.getKey();
-        this.started = TransactionScope.this.timestamp.toString();
-        this.duration = Duration.between(Instant.now(), TransactionScope.this.timestamp).toNanos() / 1_000_000_000.0;
-        this.payload = TransactionContext.get().getPayload().entrySet().stream()
+  private TransactionRecord asTransactionRecord() {
+    return new TransactionRecord(
+        TransactionScope.this.getKey(),
+        TransactionScope.this.timestamp.toString(),
+        Duration.between(Instant.now(), TransactionScope.this.timestamp).toNanos() / 1_000_000_000.0,
+        TransactionContext.get().getPayload().entrySet().stream()
             .collect(Collectors.toMap(
                 x -> x.getKey().getTypeName(),
                 Map.Entry::getValue,
                 (v1, v2) -> v1,
-                LinkedHashMap::new));
-      }
-    };
+                LinkedHashMap::new)));
   }
 
   @Override

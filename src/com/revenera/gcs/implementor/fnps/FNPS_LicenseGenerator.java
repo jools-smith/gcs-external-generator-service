@@ -33,7 +33,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
       final GeneratorResources res = new GeneratorResources(technologyId());
 
       final Path executablePath = res.getExecutablePath("hbk-signer.exe");
@@ -122,7 +122,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getDiagnosticsFactory().makeTransactionContext()) {
+    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
       return new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();

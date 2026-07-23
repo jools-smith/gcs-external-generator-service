@@ -3,6 +3,8 @@ package com.revenera.gcs;
 import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.transaction.ExecutionManagement;
+import com.revenera.gcs.transaction.TransactionManagement;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -42,9 +44,14 @@ public class Beans {
   }
 
   private final static DiagnosticsFactory diagnosticsFactory = new DiagnosticsFactory();
-  public static DiagnosticsFactory getDiagnosticsFactory() {
+
+  public static ExecutionManagement getExecutionManager() {
     return diagnosticsFactory;
   }
+  public static TransactionManagement getTransactionManager() {
+    return diagnosticsFactory;
+  }
+
   public static Path getLogPath() {
     return Paths.get(web_inf, "logs");
   }

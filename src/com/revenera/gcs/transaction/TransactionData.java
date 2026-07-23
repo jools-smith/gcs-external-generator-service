@@ -8,9 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TransactionData {
-  public final ImplementorFactory implementorFactory = Beans.getImplementorFactory();
-  public final DiagnosticsFactory diagnosticsFactory = Beans.getDiagnosticsFactory();
-  public final ApplicationProiperties applicationProperties = Beans.getApplicationProperties();
+  private final ImplementorFactory implementorFactory = Beans.getImplementorFactory();
+  private final ExecutionManagement diagnosticsFactory = Beans.getExecutionManager();
+  private final TransactionManagement transactionManagement = Beans.getTransactionManager();
+  private final ApplicationProiperties applicationProperties = Beans.getApplicationProperties();
 
   private final Map<Class<?>, Object> payload = new LinkedHashMap<>();
 
@@ -28,4 +29,19 @@ public class TransactionData {
     return this.payload;
   }
 
+  public ApplicationProiperties getApplicationProperties() {
+    return applicationProperties;
+  }
+
+  public ExecutionManagement getDiagnosticsFactory() {
+    return diagnosticsFactory;
+  }
+
+  public TransactionManagement getTransactionManagement() {
+    return transactionManagement;
+  }
+
+  public ImplementorFactory getImplementorFactory() {
+    return implementorFactory;
+  }
 }

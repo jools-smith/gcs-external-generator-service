@@ -15,7 +15,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   public PingResponse ping1(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
       logger.json(Level.DEBUG, payload);
       final String tech = ServiceHelper.getLicenseTechnology(payload);
 
@@ -32,7 +32,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 //      logger.json(Level.DEBUG, payload);
 
       return Beans
@@ -48,7 +48,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public Status validateProduct(final ProductRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -64,7 +64,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public Status validateLicenseModel(final LicenseModelRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -79,7 +79,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -94,7 +94,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -109,7 +109,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -126,7 +126,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest payload)
       throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()
@@ -141,7 +141,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()){
 
       return Beans
           .getImplementorFactory()

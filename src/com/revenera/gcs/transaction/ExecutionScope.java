@@ -29,6 +29,6 @@ public class ExecutionScope implements AutoCloseable {
 
   @Override
   public void close() {
-    this.factory.submitExecutionContext(this);
+    this.factory.submitExecutionScope(this);
   }
 }

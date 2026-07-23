@@ -4,9 +4,9 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
 import com.revenera.gcs.transaction.ExecutionScope;
 import com.revenera.gcs.implementor.GeneratorImplementor;
+import com.revenera.gcs.transaction.TransactionRecord;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -89,10 +89,10 @@ public class Application implements
   }
 
   private void polling() {
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
-      while (Beans.getDiagnosticsFactory().hasTransactions()) {
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
+      while (Beans.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
-        final DiagnosticsFactory.TransactionRecord content = Beans.getDiagnosticsFactory().pollTransactions();
+        final TransactionRecord content = Beans.getTransactionManager().pollTransactions();
         if (content != null) {
           serializeToLogPath(content.key + ".json",
               Collections.singletonList(
@@ -106,7 +106,7 @@ public class Application implements
   }
 
   private void logging() {
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
 
       final List<String> messages = new ArrayList<>();
       while (LoggingFactory.hasMessages()) {
@@ -123,9 +123,9 @@ public class Application implements
   }
 
   private void housekeeping() {
-    try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()) {
+    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
       //TODO:what is this supposed to do?
-      logger.yaml(Level.DEBUG, Beans.getDiagnosticsFactory().getRecords());
+      logger.yaml(Level.DEBUG, Beans.getExecutionManager().getRecords());
     }
     catch (final Throwable t) {
       logger.exception(t);

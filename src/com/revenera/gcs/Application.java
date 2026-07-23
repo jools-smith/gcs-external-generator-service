@@ -5,9 +5,8 @@ import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.AnnotationManager;
 import com.revenera.gcs.transaction.ExecutionScope;
-import com.revenera.gcs.utils.GeneratorImplementor;
+import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 

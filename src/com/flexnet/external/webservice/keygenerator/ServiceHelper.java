@@ -1,28 +1,29 @@
-package com.revenera.gcs;
+package com.flexnet.external.webservice.keygenerator;
 
 import com.flexnet.external.type.*;
-import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.Utils;
-import com.revenera.gcs.logging.LoggingFactory;
 
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
+public class ServiceHelper {
+  public static String getStackTraceElement(final StackTraceElement frame) {
+    return String.join("|",
+        frame.getFileName(),
+        frame.getClassName(),
+        frame.getMethodName(),
+        String.valueOf(frame.getLineNumber()));
+  }
+  
+  public static SvcException makeServiceException(final Throwable throwable) {
+    final StackTraceElement frame = Thread.currentThread().getStackTrace()[3];
 
-public abstract class ServiceBase {
+    final SvcException sex = new SvcException();
+    sex.setMessage(getStackTraceElement(frame));
+    sex.setName(throwable.getClass().getName());
 
-  protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
-
-  protected ServiceBase() {
-    this.logger.in();
+    return sex;
   }
 
-  /**
-   *
-   * @param obj request payload from which to assess the FNO license technology name
-   * @return FNO license technology name
-   */
-  protected String getLicenseTechnology(final Object obj) {
+  public static String getLicenseTechnology(final Object obj) {
     final AtomicReference<LicenseTechnology> tech = new AtomicReference<>();
 
     if (obj instanceof ProductRequest) {
@@ -71,20 +72,4 @@ public abstract class ServiceBase {
       return tech.get().getName();
     }
   }
-
-  String frameDetails(final StackTraceElement frame) {
-    return  String.join("|",
-            frame.getFileName(),
-            frame.getClassName(),
-            frame.getMethodName(),
-            java.lang.String.valueOf(frame.getLineNumber()));
-  }
-
-  public Function<Throwable, SvcException> serviceException = (throwable) -> new SvcException() {
-    {
-      this.setMessage(frameDetails(Thread.currentThread().getStackTrace()[3]));
-      
-      this.setName(throwable.getClass().getName());
-    }
-  };
 }

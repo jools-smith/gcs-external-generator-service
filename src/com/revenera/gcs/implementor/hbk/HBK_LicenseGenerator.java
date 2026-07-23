@@ -4,6 +4,7 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
+import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.transaction.TransactionContext;
 import com.revenera.gcs.transaction.TransactionScope;

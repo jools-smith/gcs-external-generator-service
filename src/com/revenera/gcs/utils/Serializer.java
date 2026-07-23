@@ -26,7 +26,7 @@ public class Serializer {
       .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
       .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
-  static String serialize(final ObjectMapper mapper, final Object payload) {
+  private static String serialize(final ObjectMapper mapper, final Object payload) {
     try {
       return mapper.writeValueAsString(payload);
     }

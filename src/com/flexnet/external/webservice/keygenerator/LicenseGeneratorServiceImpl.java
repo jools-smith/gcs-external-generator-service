@@ -2,7 +2,6 @@ package com.flexnet.external.webservice.keygenerator;
 
 import com.flexnet.external.type.*;
 import com.revenera.gcs.Beans;
-import com.revenera.gcs.ServiceBase;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.transaction.ExecutionScope;
 
@@ -18,7 +17,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
       logger.json(Level.DEBUG, payload);
-      final String tech = super.getLicenseTechnology(payload);
+      final String tech = ServiceHelper.getLicenseTechnology(payload);
 
       return Beans
           .getImplementorFactory()
@@ -26,7 +25,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
           .ping(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -34,16 +33,15 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
-      logger.json(Level.DEBUG, payload);
-      final String tech = super.getLicenseTechnology(payload);
+//      logger.json(Level.DEBUG, payload);
 
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .ping(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -52,15 +50,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateProduct(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
 
   }
@@ -70,15 +66,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateLicenseModel(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -87,15 +81,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateLicense(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -104,15 +96,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .consolidateFulfillments(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -121,15 +111,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateLicenseFilenames(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -140,15 +128,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final ExecutionScope context = Beans.getDiagnosticsFactory().makeExecutionContext()){
 
-      final String tech = super.getLicenseTechnology(payload);
-
       return Beans
           .getImplementorFactory()
-          .getImplementor(tech)
+          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateConsolidatedLicenseFilenames(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 
@@ -163,7 +149,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
           .generateCustomHostIdentifier(payload);
     }
     catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
+      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
     }
   }
 }

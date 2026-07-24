@@ -2,6 +2,7 @@ package com.revenera.gcs.implementor.hbk;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
+import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
@@ -37,7 +38,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
@@ -138,7 +139,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       return TransactionContext.get().add(ConsolidatedLicense.class, new ConsolidatedLicense() {

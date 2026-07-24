@@ -1,6 +1,8 @@
 package com.revenera.gcs.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.revenera.gcs.Application;
+import com.revenera.gcs.logging.LoggingFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -9,12 +11,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransactionScope implements AutoCloseable {
+  private static final LoggingFactory logger = LoggingFactory.create(TransactionScope.class);
+
   private final Instant timestamp = Instant.now();;
   private final StackTraceElement frame;
 
   private final DiagnosticsFactory factory;
 
   public TransactionScope(final DiagnosticsFactory factory, final int depth) {
+    logger.in();
+
     this.factory = factory;
     try {
       throw new Exception();
@@ -22,8 +28,8 @@ public class TransactionScope implements AutoCloseable {
     catch (final Exception e) {
       this.frame = e.getStackTrace()[depth];
     }
-    //TODO:
-    TransactionContext.set(new TransactionData());
+
+    TransactionContext.initialize();
   }
 
   @JsonIgnore
@@ -32,9 +38,10 @@ public class TransactionScope implements AutoCloseable {
     try {
       classname = Class.forName(this.frame.getClassName()).getSimpleName();
     }
-    catch (final ClassNotFoundException ignored) {
-
+    catch (final ClassNotFoundException e) {
+      logger.exception(e);
     }
+
     return String.join(".",
         this.timestamp.toString()
             .replace('T', '.')
@@ -61,6 +68,10 @@ public class TransactionScope implements AutoCloseable {
 
   @Override
   public void close() {
+    logger.in();
+
     this.factory.submitTransactionContext(asTransactionRecord());
+
+    TransactionContext.clear();
   }
 }

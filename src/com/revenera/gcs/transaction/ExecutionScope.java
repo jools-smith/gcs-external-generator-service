@@ -1,14 +1,17 @@
 package com.revenera.gcs.transaction;
 
+import com.revenera.gcs.logging.LoggingFactory;
+
 import java.time.Instant;
 
 public class ExecutionScope implements AutoCloseable {
-
+  private static final LoggingFactory logger = LoggingFactory.create(ExecutionScope.class);
   private final Instant timestamp;
   private final StackTraceElement frame;
   private final DiagnosticsFactory factory;
 
   public ExecutionScope(final DiagnosticsFactory factory, final int depth) {
+//    logger.in();
     this.timestamp = Instant.now();
     this.factory = factory;
     try {
@@ -29,6 +32,7 @@ public class ExecutionScope implements AutoCloseable {
 
   @Override
   public void close() {
+//    logger.in();
     this.factory.submitExecutionScope(this);
   }
 }

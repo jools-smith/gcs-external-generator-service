@@ -2,6 +2,7 @@ package com.revenera.gcs.implementor.diag;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
+import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
@@ -17,9 +18,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public Status validateProduct(final ProductRequest product) {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(product);
-
       return TransactionContext.get().add(Status.class, new Status() {
         {
           this.message = Serializer.safeSerializeYaml(product);
@@ -31,9 +31,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
-
       return TransactionContext.get().add(Status.class, new Status() {
         {
           this.message = Serializer.safeSerializeYaml(request);
@@ -45,9 +44,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
-
       return TransactionContext.get().add(GeneratorResponse.class, new GeneratorResponse() {
         {
           this.licenseFiles = makeLicenseFiles(
@@ -65,9 +63,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
-
       return TransactionContext.get().add(ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.licenseFileName = "license";
@@ -79,9 +76,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
-
       return TransactionContext.get().add(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
         {
           this.item = new ArrayList<>();
@@ -92,7 +88,7 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       return TransactionContext.get().add(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
@@ -105,7 +101,7 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-    try (final TransactionScope unused = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope unused = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
 
       return Serializer.safeSerializeYaml(request);

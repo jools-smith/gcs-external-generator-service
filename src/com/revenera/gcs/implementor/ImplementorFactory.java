@@ -6,13 +6,14 @@ import com.revenera.gcs.logging.LoggingFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ImplementorFactory {
+public class ImplementorFactory implements ImplementorManagement {
   private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
 
   private final Map<String, LicenseGeneratorServiceInterface> implementors = new HashMap<>();
 
   private LicenseGeneratorServiceInterface defaultImplementor = null;
 
+  @Override
   public void addImplementor(final GeneratorBase imp, final boolean isDefault) {
 
     logger.debug().log(imp.technologyId() + " -> " + imp.getClass().getSimpleName());
@@ -24,10 +25,12 @@ public class ImplementorFactory {
     }
   }
 
+  @Override
   public LicenseGeneratorServiceInterface getDefaultImplementor() {
     return this.defaultImplementor;
   }
 
+  @Override
   public LicenseGeneratorServiceInterface getImplementor(final String id) {
 
     if (this.implementors.containsKey(id)) {

@@ -38,9 +38,9 @@ public class Application implements
   private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
   static {
-    try {
+    try (final AppContext ctx = Beans.makeContext()) {
       final Level level = Level.valueOf(
-          Beans.getApplicationProperties().getLoggingLevel().toUpperCase());
+          AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
       LoggingFactory.setLoggingLevel(level);
 
@@ -53,10 +53,10 @@ public class Application implements
 
   public Application() {
     logger.in();
-    try {
+    try (final AppContext ctx = Beans.makeContext()) {
       logger.me(this);
 
-      logger.info().log("version", Beans.getApplicationProperties().getVersionDetails());
+      logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -89,14 +89,16 @@ public class Application implements
   }
 
   private void polling() {
-    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
-      while (Beans.getTransactionManager().hasTransactions()) {
-        //TODO:need to depopulate the queue even if not serializing
-        final TransactionRecord content = Beans.getTransactionManager().pollTransactions();
-        if (content != null) {
-          serializeToLogPath(content.key + ".json",
-              Collections.singletonList(
-                  Serializer.safeSerializeJsonIndented(content)));
+    try (final AppContext ctx = Beans.makeContext()) {
+      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
+        while (AppContext.getTransactionManager().hasTransactions()) {
+          //TODO:need to depopulate the queue even if not serializing
+          final TransactionRecord content = AppContext.getTransactionManager().pollTransactions();
+          if (content != null) {
+            serializeToLogPath(content.key + ".json",
+                Collections.singletonList(
+                    Serializer.safeSerializeJsonIndented(content)));
+          }
         }
       }
     }
@@ -105,27 +107,34 @@ public class Application implements
     }
   }
 
-  private void logging() {
-    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
+  private void logging()  {
+    try (final AppContext ctx = Beans.makeContext()) {
+      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
 
-      final List<String> messages = new ArrayList<>();
-      while (LoggingFactory.hasMessages()) {
-        final String content = LoggingFactory.pollMessageQueue();
-        if (content != null) {
-          messages.add(content);
+        final List<String> messages = new ArrayList<>();
+        while (LoggingFactory.hasMessages()) {
+          final String content = LoggingFactory.pollMessageQueue();
+          if (content != null) {
+            messages.add(content);
+          }
+        }
+
+        if (!messages.isEmpty()) {
+          serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
         }
       }
-
-      if (!messages.isEmpty()) {
-        serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
-      }
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
     }
   }
 
   private void housekeeping() {
-    try (final ExecutionScope context = Beans.getExecutionManager().makeExecutionScope()) {
-      //TODO:what is this supposed to do?
-      logger.yaml(Level.DEBUG, Beans.getExecutionManager().getRecords());
+    try (final AppContext ctx = Beans.makeContext()) {
+      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
+        //TODO:what is this supposed to do?
+        logger.yaml(Level.DEBUG, AppContext.getExecutionManager().getRecords());
+      }
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -139,7 +148,7 @@ public class Application implements
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
 
-    try {
+    try (final AppContext ctx = Beans.makeContext()) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
       final AnnotationManager manager = new AnnotationManager();
@@ -166,12 +175,12 @@ public class Application implements
 
             imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 
-            Beans.getImplementorFactory().addImplementor(imp, annotation.isDefault());
+            AppContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
           }
         }
       }
 
-      final LicenseGeneratorServiceInterface implementor = Beans.getImplementorFactory().getDefaultImplementor();
+      final LicenseGeneratorServiceInterface implementor = AppContext.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {
         logger.info().log("default implementor", implementor.getClass().getName());
       }
@@ -181,15 +190,14 @@ public class Application implements
 
       this.housekeeper.initialize();
 
-      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, Beans.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
+      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, AppContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
       this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
       this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
+
+      logger.yaml(Level.DEBUG, AppContext.getApplicationData());
     }
     catch (final Throwable t) {
       logger.exception(t);
-    }
-    finally {
-      logger.yaml(Level.DEBUG, Beans.getApplicationData());
     }
   }
 

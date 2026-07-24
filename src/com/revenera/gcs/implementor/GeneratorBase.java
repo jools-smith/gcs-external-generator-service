@@ -4,6 +4,7 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.flexnet.external.webservice.keygenerator.ServiceHelper;
+import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Serializer;
@@ -80,9 +81,9 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
       {
         this.str = String.join(" | ",
             "GCS External Generator Service",
-            Beans.getApplicationProperties().getVersion(),
-            Beans.getApplicationProperties().getDate(),
-            Beans.getApplicationProperties().getTime());
+            AppContext.getApplicationProperties().getVersion(),
+            AppContext.getApplicationProperties().getDate(),
+            AppContext.getApplicationProperties().getTime());
 
         this.processedTime = Instant.now().toString();
         this.info = String.join(" | ",
@@ -99,7 +100,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
     try {
       return new PingResponse() {
         {
-          this.info = Serializer.safeSerializeYaml(Beans.getApplicationData());
+          this.info = Serializer.safeSerializeYaml(AppContext.getApplicationData());
 
           class Bag {
             final Map<String, Object> elements = new LinkedHashMap<>();
@@ -125,9 +126,9 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
           this.str = new Bag()
               .with("technology", logger.getType().getSimpleName(), technologyId())
               .with("version",
-                  Beans.getApplicationProperties().getVersion(),
-                  Beans.getApplicationProperties().getDate(),
-                  Beans.getApplicationProperties().getTime())
+                  AppContext.getApplicationProperties().getVersion(),
+                  AppContext.getApplicationProperties().getDate(),
+                  AppContext.getApplicationProperties().getTime())
               .with("system",
                   SystemProperties.getOsName(),
                   SystemProperties.getOsVersion(),
@@ -157,7 +158,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       logger.in();
 
       TransactionContext.get().add(request);
@@ -168,7 +169,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       return new Status() {
         {
@@ -181,7 +182,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       return new Status() {
         {
@@ -194,7 +195,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       final String license = request.getFulfillments().stream().flatMap(fulfilment -> fulfilment.getLicenseFiles().stream()).filter(lfd -> String.class.isAssignableFrom(lfd.getValue().getClass())).map(lfd -> lfd.getValue().toString()).collect(Collectors.joining("\n"));
 
@@ -215,7 +216,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
     }
@@ -223,7 +224,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
     }
@@ -231,7 +232,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = Beans.getTransactionManager().makeTransactionScope()) {
+    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
       TransactionContext.get().add(request);
       return except(String.class, "generateCustomHostIdentifier not implemented");
     }

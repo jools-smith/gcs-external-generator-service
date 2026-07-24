@@ -2,10 +2,9 @@ package com.revenera.gcs;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.GeneratorBase;
+import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
-import com.revenera.gcs.transaction.ExecutionScope;
-import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.transaction.TransactionRecord;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
@@ -71,7 +70,6 @@ public class Application implements
 
   private void serializeToLogPath(final String filename, final List<String> content) {
     try {
-//      final String root = Beans.applicationProperties.getLoggingRoot();
       //TODO: log into log directory in web app
       final String root = Beans.getLogPath().toRealPath().toString();
 
@@ -83,22 +81,21 @@ public class Application implements
             true);
       }
     }
-    catch (final Exception e) {
-      //TODO:?
+    catch (final Throwable t) {
+      logger.exception(t);
     }
   }
 
   private void polling() {
     try (final AppContext ctx = Beans.makeContext()) {
-      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
-        while (AppContext.getTransactionManager().hasTransactions()) {
-          //TODO:need to depopulate the queue even if not serializing
-          final TransactionRecord content = AppContext.getTransactionManager().pollTransactions();
-          if (content != null) {
-            serializeToLogPath(content.key + ".json",
-                Collections.singletonList(
-                    Serializer.safeSerializeJsonIndented(content)));
-          }
+
+      while (AppContext.getTransactionManager().hasTransactions()) {
+        //TODO:need to depopulate the queue even if not serializing
+        final TransactionRecord content = AppContext.getTransactionManager().pollTransactions();
+        if (content != null) {
+          serializeToLogPath(content.key + ".json",
+              Collections.singletonList(
+                  Serializer.safeSerializeJsonIndented(content)));
         }
       }
     }
@@ -107,21 +104,19 @@ public class Application implements
     }
   }
 
-  private void logging()  {
+  private void logging() {
     try (final AppContext ctx = Beans.makeContext()) {
-      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
 
-        final List<String> messages = new ArrayList<>();
-        while (LoggingFactory.hasMessages()) {
-          final String content = LoggingFactory.pollMessageQueue();
-          if (content != null) {
-            messages.add(content);
-          }
+      final List<String> messages = new ArrayList<>();
+      while (LoggingFactory.hasMessages()) {
+        final String content = LoggingFactory.pollMessageQueue();
+        if (content != null) {
+          messages.add(content);
         }
+      }
 
-        if (!messages.isEmpty()) {
-          serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
-        }
+      if (!messages.isEmpty()) {
+        serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
       }
     }
     catch (final Throwable t) {
@@ -131,10 +126,8 @@ public class Application implements
 
   private void housekeeping() {
     try (final AppContext ctx = Beans.makeContext()) {
-      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
-        //TODO:what is this supposed to do?
-        logger.yaml(Level.DEBUG, AppContext.getExecutionManager().getRecords());
-      }
+      //TODO:what is this supposed to do?
+      logger.yaml(Level.DEBUG, AppContext.getExecutionManager().getRecords());
     }
     catch (final Throwable t) {
       logger.exception(t);

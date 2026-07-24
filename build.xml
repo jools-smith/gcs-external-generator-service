@@ -96,8 +96,8 @@
 
         <!-- this copy works -->
         <echo file="${build}/revenera.properties">
-build.version.major=1
-build.version.minor=2
+build.version.major=2
+build.version.minor=0
 build.number=${build.number}
 build.timestamp=${build.timestamp}
 build.date=${build.date}

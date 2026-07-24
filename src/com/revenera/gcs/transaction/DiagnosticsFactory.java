@@ -21,25 +21,21 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
   }
 
   @Override
-  public void submitExecutionScope(final ExecutionScope context) {
-    final Duration dur =  Duration.between(context.getTimestamp(), Instant.now());
+  public void submitExecutionDetails(final Instant timestamp, final StackTraceElement frame) {
+    final Duration dur =  Duration.between(timestamp, Instant.now());
 
     final Optional<ExecutionRecord> item = records.stream()
-        .filter(e -> e.matches(context.getFrame()))
+        .filter(e -> e.matches(frame))
         .findFirst();
 
     if (item.isPresent()) {
       item.get().touch(dur);
     }
     else {
-      records.add(new ExecutionRecord(context.getFrame()).touch(dur));
+      records.add(new ExecutionRecord(frame).touch(dur));
     }
   }
 
-  @Override
-  public ExecutionScope makeExecutionScope() {
-    return new ExecutionScope(this,2);
-  }
 
   @Override
   public TransactionScope makeTransactionScope() {

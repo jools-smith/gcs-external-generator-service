@@ -138,7 +138,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
                   SystemUtils.getHostName(),
                   SystemProperties.getUserName("unknown"))
               .with("path", Beans.getResourcePath())
-              .with("up-time", Beans.getApplicationDuration())
+              .with("up-time", AppContext.getApplicationDuration())
               .build();
 
           this.processedTime = Instant.now().toString();

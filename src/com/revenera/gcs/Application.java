@@ -92,10 +92,15 @@ public class Application implements
       while (AppContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
         final Map.Entry<Object, Object> content = AppContext.getTransactionManager().pollTransactions();
+//        if (content != null) {
+//          serializeToLogPath(content.getKey() + ".json",
+//              Collections.singletonList(
+//                  Serializer.safeSerializeJsonIndented(content.getValue())));
+//        }
         if (content != null) {
-          serializeToLogPath(content.getKey() + ".json",
+          serializeToLogPath(content.getKey() + ".yaml",
               Collections.singletonList(
-                  Serializer.safeSerializeJsonIndented(content.getValue())));
+                  Serializer.safeSerializeYaml(content.getValue())));
         }
       }
     }

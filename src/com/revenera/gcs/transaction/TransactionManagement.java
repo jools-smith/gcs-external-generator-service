@@ -14,5 +14,5 @@ public interface TransactionManagement {
       final Instant start,
       final Object request,
       final Object response,
-      final List<Map.Entry<Class<?>, Object>> payload);
+      final Object payload);
 }

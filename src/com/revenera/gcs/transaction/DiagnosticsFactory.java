@@ -67,7 +67,7 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
     frame, start, duration, request, response, payload
   }
   @Override
-  public void submitTransaction(final Frame frame, final Instant start, final Object request, final Object response,final List<Map.Entry<Class<?>, Object>> payload ) {
+  public void submitTransaction(final Frame frame, final Instant start, final Object request, final Object response,final Object payload ) {
 
     final String classname = frame.getSimpleClassName();
     final String method = frame.getMethodName();
@@ -85,17 +85,13 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
       {
         put(TransTypes.frame, frame);
         put(TransTypes.start, start.toString());
-        put(TransTypes.duration, Duration.between(Instant.now(), start).toNanos() / 1_000_000_000.0);
+        put(TransTypes.duration, Duration.between(start, Instant.now()).toNanos() / 1_000_000_000.0);
 
         Optional.ofNullable(request).ifPresent(e -> put(TransTypes.request, request));
 
         Optional.ofNullable(response).ifPresent(e -> put(TransTypes.response, response));
 
-        Optional.ofNullable(payload).ifPresent(e -> {
-          if (!payload.isEmpty()) {
-            put(TransTypes.payload, request);
-          }
-        });
+        Optional.ofNullable(payload).ifPresent(e -> put(TransTypes.payload, request));
       }
     }));
   }

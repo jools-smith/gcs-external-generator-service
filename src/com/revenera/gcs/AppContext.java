@@ -17,36 +17,58 @@ import java.util.function.Function;
 public class AppContext implements AutoCloseable {
   private static final LoggingFactory logger = LoggingFactory.create(AppContext.class);
 
-  static class Data {
-    Map.Entry<Class<?>, Object> request;
-    Map.Entry<Class<?>, Object> response;
-    final List<Map.Entry<Class<?>, Object>> payload = new LinkedList<>();
-    final Instant timestamp = Instant.now();
-    final Frame frame;
+  static class DataObject {
+    public final Frame frame;
+    public final Class<?> type;
+    public final Object data;
 
-    Data(final Frame frame) {
+    DataObject(final Frame frame, final Object data, final Class<?> type) {
+      this.frame = frame;
+      this.data = data;
+      this.type = type;
+    }
+
+    DataObject(final Frame frame, final Object data) {
+      this(frame, data, data.getClass());
+    }
+  }
+
+  static class Transaction {
+    final Frame frame;
+    final Instant timestamp = Instant.now();
+
+    DataObject request;
+    DataObject response;
+    List<DataObject> payload;
+
+    Transaction(final Frame frame) {
       this.frame = frame;
     }
 
     boolean hasData() {
-      return this.request != null || this.response != null || !this.payload.isEmpty();
+      return this.request != null || this.response != null || this.payload != null;
     }
   }
 
-  static final ThreadLocal<Data> context = new ThreadLocal<>();
+  static final ThreadLocal<Transaction> context = new ThreadLocal<>();
 
   AppContext(final int depth) {
-    context.set(new Data(new Frame(depth)));
+    context.set(new Transaction(new Frame(depth)));
   }
 
   @Override
   public void close() {
-    final Data data = context.get();
+    final Transaction transaction = context.get();
 
-    Beans.diagnosticsFactory.submitExecutionDetails(data.timestamp, data.frame);
+    Beans.diagnosticsFactory.submitExecutionDetails(transaction.timestamp, transaction.frame);
 
-    if (data.hasData()) {
-      Beans.diagnosticsFactory.submitTransaction(data.frame, data.timestamp, data.request, data.response, data.payload);
+    if (transaction.hasData()) {
+      Beans.diagnosticsFactory.submitTransaction(
+          transaction.frame,
+          transaction.timestamp,
+          transaction.request,
+          transaction.response,
+          transaction.payload);
     }
 
     // clear down thread data
@@ -54,18 +76,24 @@ public class AppContext implements AutoCloseable {
   }
 
   public static void injectRequest(final Object data) {
-    context.get().request = new AbstractMap.SimpleImmutableEntry<>(data.getClass(), data);
+    context.get().request = new DataObject(new Frame(1), data);
   }
 
   public static void injectPayload(final Object data) {
-    context.get().payload.add(new AbstractMap.SimpleImmutableEntry<>(data.getClass(), data));
+    final Transaction ctx = context.get();
+
+    if (ctx.payload == null) {
+      ctx.payload = new LinkedList<>();
+    }
+
+    ctx.payload.add(new DataObject(new Frame(1), data));
   }
 
   public static <T> T injectResponse(final Class<T> type, final T data) {
 
     final Class<?> clazz = type.equals(data.getClass().getSuperclass()) ? type : data.getClass();
 
-    context.get().response = new AbstractMap.SimpleImmutableEntry<>(clazz, data);
+    context.get().response = new DataObject(new Frame(1), data, clazz);
 
     return data;
   }

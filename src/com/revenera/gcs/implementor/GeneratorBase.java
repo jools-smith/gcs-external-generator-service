@@ -3,13 +3,10 @@ package com.revenera.gcs.implementor;
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
-import com.flexnet.external.webservice.keygenerator.ServiceHelper;
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Serializer;
-import com.revenera.gcs.transaction.TransactionContext;
-import com.revenera.gcs.transaction.TransactionScope;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -66,7 +63,7 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public String technologyId() {
-   return this.technology.id;
+    return this.technology.id;
   }
 
   @Override
@@ -158,56 +155,51 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      logger.in();
+    logger.in();
 
-      TransactionContext.get().add(request);
+    AppContext.inject(request);
 
-      return TransactionContext.get().add(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
-    }
+    return AppContext.inject(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
   }
 
   @Override
   public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      return new Status() {
-        {
-          this.message = "product is validated | " + request.getName() + " | " + request.getVersion();
-          this.code = 0;
-        }
-      };
-    }
+
+    AppContext.inject(request);
+    return new Status() {
+      {
+        this.message = "product is validated | " + request.getName() + " | " + request.getVersion();
+        this.code = 0;
+      }
+    };
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      return new Status() {
-        {
-          this.message = "license request is validated | " + request.getName();
-          this.code = 0;
-        }
-      };
-    }
+
+    AppContext.inject(request);
+    return new Status() {
+      {
+        this.message = "license request is validated | " + request.getName();
+        this.code = 0;
+      }
+    };
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      final String license = request.getFulfillments().stream().flatMap(fulfilment -> fulfilment.getLicenseFiles().stream()).filter(lfd -> String.class.isAssignableFrom(lfd.getValue().getClass())).map(lfd -> lfd.getValue().toString()).collect(Collectors.joining("\n"));
 
-      return new ConsolidatedLicense() {
-        {
-          this.fulfillments = request.getFulfillments();
+    AppContext.inject(request);
+    final String license = request.getFulfillments().stream().flatMap(fulfilment -> fulfilment.getLicenseFiles().stream()).filter(lfd -> String.class.isAssignableFrom(lfd.getValue().getClass())).map(lfd -> lfd.getValue().toString()).collect(Collectors.joining("\n"));
 
-          request.getFulfillments().stream().findAny().ifPresent(fid -> this.licFiles =
-              makeLicenseFiles(fid.getLicenseTechnology().getLicenseFileDefinitions(), license, null));
-        }
-      };
-    }
+    return new ConsolidatedLicense() {
+      {
+        this.fulfillments = request.getFulfillments();
+
+        request.getFulfillments().stream().findAny().ifPresent(fid -> this.licFiles =
+            makeLicenseFiles(fid.getLicenseTechnology().getLicenseFileDefinitions(), license, null));
+      }
+    };
   }
 
   private <T> T except(final Class<T> type, final String message) {
@@ -216,25 +208,22 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
-    }
+
+    AppContext.inject(request);
+    return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
-    }
+
+    AppContext.inject(request);
+    return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
-      return except(String.class, "generateCustomHostIdentifier not implemented");
-    }
+
+    AppContext.inject(request);
+    return except(String.class, "generateCustomHostIdentifier not implemented");
   }
 }

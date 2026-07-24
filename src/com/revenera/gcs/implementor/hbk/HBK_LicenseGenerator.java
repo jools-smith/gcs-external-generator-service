@@ -3,13 +3,10 @@ package com.revenera.gcs.implementor.hbk;
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.AppContext;
-import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
-import com.revenera.gcs.transaction.TransactionContext;
-import com.revenera.gcs.transaction.TransactionScope;
-import com.revenera.gcs.utils.*;
+import com.revenera.gcs.utils.Serializer;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
@@ -38,8 +35,8 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
+    try {
+      AppContext.inject(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
@@ -113,7 +110,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return TransactionContext.get().add(GeneratorResponse.class, new GeneratorResponse() {
+        return AppContext.inject(GeneratorResponse.class, new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -139,10 +136,10 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
-      TransactionContext.get().add(request);
+    try {
+      AppContext.inject(request);
 
-      return TransactionContext.get().add(ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return AppContext.inject(ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 

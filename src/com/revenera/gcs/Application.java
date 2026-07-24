@@ -5,7 +5,6 @@ import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
-import com.revenera.gcs.transaction.TransactionRecord;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -18,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -91,11 +91,11 @@ public class Application implements
 
       while (AppContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
-        final TransactionRecord content = AppContext.getTransactionManager().pollTransactions();
+        final Map.Entry<String, Object> content = AppContext.getTransactionManager().pollTransactions();
         if (content != null) {
-          serializeToLogPath(content.key + ".json",
+          serializeToLogPath(content.getKey() + ".json",
               Collections.singletonList(
-                  Serializer.safeSerializeJsonIndented(content)));
+                  Serializer.safeSerializeJsonIndented(content.getValue())));
         }
       }
     }

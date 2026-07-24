@@ -34,6 +34,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
     try (final AppContext ctx = Beans.makeContext()) {
+      // invoke implementor
       return AppContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
@@ -48,13 +49,11 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public Status validateProduct(final ProductRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
     try (final AppContext ctx = Beans.makeContext()) {
-
-
+      // invoke implementor
       return AppContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateProduct(payload);
-
     }
     catch (final Throwable t) {
       throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));

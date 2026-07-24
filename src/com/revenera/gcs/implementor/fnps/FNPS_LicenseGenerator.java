@@ -2,13 +2,10 @@ package com.revenera.gcs.implementor.fnps;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
-import com.revenera.gcs.AppContext;
-import com.revenera.gcs.Beans;
 import com.revenera.gcs.implementor.GeneratorBase;
-import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.implementor.GeneratorImplementor;
+import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.utils.Serializer;
-import com.revenera.gcs.transaction.TransactionScope;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -34,7 +31,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
+    try {
       final GeneratorResources res = new GeneratorResources(technologyId());
 
       final Path executablePath = res.getExecutablePath("hbk-signer.exe");
@@ -120,7 +117,7 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
-    try (final TransactionScope context = AppContext.getTransactionManager().makeTransactionScope()) {
+    try {
       return new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();

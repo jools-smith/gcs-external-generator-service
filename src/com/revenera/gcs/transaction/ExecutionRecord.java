@@ -1,6 +1,7 @@
 package com.revenera.gcs.transaction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.revenera.gcs.utils.Frame;
 
 import java.time.Duration;
 
@@ -9,18 +10,18 @@ public class ExecutionRecord {
   private Duration duration;
   private long count;
 
-  private static String makeKey(final StackTraceElement element) {
+  private static String makeKey(final Frame element) {
     return element.getClassName() + "." + element.getMethodName() + ":" + element.getLineNumber();
   }
 
-  ExecutionRecord(final StackTraceElement element) {
+  ExecutionRecord(final Frame element) {
     this.key = makeKey(element);
     this.duration = Duration.ZERO;
     this.count = 0;
   }
 
   @JsonIgnore
-  public boolean matches(final StackTraceElement element) {
+  public boolean matches(final Frame element) {
     return this.key.equals(makeKey(element));
   }
 

@@ -1,7 +1,7 @@
 package com.revenera.gcs.transaction;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.utils.Frame;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -13,7 +13,7 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
 
   private final List<ExecutionRecord> records = new LinkedList<>();
 
-  private final Queue<TransactionRecord> transactions = new ConcurrentLinkedQueue<>();
+  private final Queue<Map.Entry<String, Object>> transactions = new ConcurrentLinkedQueue<>();
 
   @Override
   public List<ExecutionRecord> getRecords() {
@@ -21,7 +21,12 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
   }
 
   @Override
-  public void submitExecutionDetails(final Instant timestamp, final StackTraceElement frame) {
+  public boolean hasRecords() {
+    return !this.records.isEmpty();
+  }
+
+  @Override
+  public void submitExecutionDetails(final Instant timestamp, final Frame frame) {
     final Duration dur =  Duration.between(timestamp, Instant.now());
 
     final Optional<ExecutionRecord> item = records.stream()
@@ -38,12 +43,7 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
 
 
   @Override
-  public TransactionScope makeTransactionScope() {
-    return new TransactionScope(this,2);
-  }
-
-  @Override
-  public TransactionRecord pollTransactions() {
+  public Map.Entry<String, Object> pollTransactions() {
     return this.transactions.poll();
   }
 
@@ -51,8 +51,42 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
   public boolean hasTransactions() {
     return !this.transactions.isEmpty();
   }
+
+  private static String getSimpleClassName(final StackTraceElement frame) {
+    String classname = frame.getClassName();
+    try {
+      classname = Class.forName(frame.getClassName()).getSimpleName();
+    }
+    catch (final ClassNotFoundException e) {
+      logger.exception(e);
+    }
+    return classname;
+  }
+
   @Override
-  public void submitTransactionContext(final TransactionRecord record) {
-    transactions.offer(record);
+  public void submitTransaction(final Frame frame, final Instant start, final List<Map.Entry<Class<?>, Object>> payload ) {
+
+    final String classname = frame.getSimpleClassName();
+    final String method = frame.getMethodName();
+
+    final String key = String.join(".",
+        start.toString()
+            .replace('T', '.')
+            .replace(':', '.')
+            .replace('-', '.')
+            .replace("Z", ""),
+        classname,
+        method);
+
+    transactions.offer(new AbstractMap.SimpleEntry<>(key, new LinkedHashMap<String, Object>() {
+      {
+        put("module", classname);
+        put("method", method);
+        put("line", frame.getLineNumber());
+        put("started", start.toString());
+        put("duration", Duration.between(Instant.now(), start).toNanos() / 1_000_000_000.0);
+        put("payload", payload);
+      }
+    }));
   }
 }

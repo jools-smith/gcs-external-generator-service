@@ -36,7 +36,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
     try {
-      AppContext.inject(request);
+      AppContext.injectRequest(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
@@ -84,6 +84,9 @@ public class HBK_LicenseGenerator extends GeneratorBase {
         }
       };
 
+      //TODO:debug
+      AppContext.injectPayload(payload);
+
       final String json = Serializer.safeSerializeJson(payload);
       logger.debug().log("payload", json);
 
@@ -110,7 +113,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return AppContext.inject(GeneratorResponse.class, new GeneratorResponse() {
+        return AppContext.injectResponse(GeneratorResponse.class, new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -137,9 +140,9 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
     try {
-      AppContext.inject(request);
+      AppContext.injectRequest(request);
 
-      return AppContext.inject(ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return AppContext.injectResponse(ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 
@@ -156,9 +159,6 @@ public class HBK_LicenseGenerator extends GeneratorBase {
                       .collect(Collectors.joining("\n"));
                 }
               }).collect(Collectors.toList());
-
-          // debug
-          //this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
         }
       });
     }

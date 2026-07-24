@@ -135,9 +135,6 @@ public class FNPS_LicenseGenerator extends GeneratorBase {
                       .collect(Collectors.joining("\n"));
                 }
               }).collect(Collectors.toList());
-
-          // debug
-          //this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
         }
       };
     }

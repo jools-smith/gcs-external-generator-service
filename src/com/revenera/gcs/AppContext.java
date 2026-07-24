@@ -18,12 +18,18 @@ public class AppContext implements AutoCloseable {
   private static final LoggingFactory logger = LoggingFactory.create(AppContext.class);
 
   static class Data {
+    Map.Entry<Class<?>, Object> request;
+    Map.Entry<Class<?>, Object> response;
     final List<Map.Entry<Class<?>, Object>> payload = new LinkedList<>();
     final Instant timestamp = Instant.now();
     final Frame frame;
 
     Data(final Frame frame) {
       this.frame = frame;
+    }
+
+    boolean hasData() {
+      return this.request != null || this.response != null || !this.payload.isEmpty();
     }
   }
 
@@ -39,20 +45,27 @@ public class AppContext implements AutoCloseable {
 
     Beans.diagnosticsFactory.submitExecutionDetails(data.timestamp, data.frame);
 
-    if (!data.payload.isEmpty()) {
-      Beans.diagnosticsFactory.submitTransaction(data.frame, data.timestamp, data.payload);
+    if (data.hasData()) {
+      Beans.diagnosticsFactory.submitTransaction(data.frame, data.timestamp, data.request, data.response, data.payload);
     }
 
     // clear down thread data
     context.remove();
   }
 
-  public static void inject(final Object data) {
+  public static void injectRequest(final Object data) {
+    context.get().request = new AbstractMap.SimpleImmutableEntry<>(data.getClass(), data);
+  }
+
+  public static void injectPayload(final Object data) {
     context.get().payload.add(new AbstractMap.SimpleImmutableEntry<>(data.getClass(), data));
   }
 
-  public static <T> T inject(Class<T> type, final T data) {
-    inject(data);
+  public static <T> T injectResponse(final Class<T> type, final T data) {
+
+    final Class<?> clazz = type.equals(data.getClass().getSuperclass()) ? type : data.getClass();
+
+    context.get().response = new AbstractMap.SimpleImmutableEntry<>(clazz, data);
 
     return data;
   }

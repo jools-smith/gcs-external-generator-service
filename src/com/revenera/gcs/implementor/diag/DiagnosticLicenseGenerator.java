@@ -16,8 +16,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public Status validateProduct(final ProductRequest product) {
 
-    AppContext.inject(product);
-    return AppContext.inject(Status.class, new Status() {
+    AppContext.injectRequest(product);
+    return AppContext.injectResponse(Status.class, new Status() {
       {
         this.message = Serializer.safeSerializeYaml(product);
         this.code = 0;
@@ -29,8 +29,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return AppContext.inject(Status.class, new Status() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(Status.class, new Status() {
       {
         this.message = Serializer.safeSerializeYaml(request);
         this.code = 0;
@@ -42,8 +42,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return AppContext.inject(GeneratorResponse.class, new GeneratorResponse() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(GeneratorResponse.class, new GeneratorResponse() {
       {
         this.licenseFiles = makeLicenseFiles(
             request.getLicenseTechnology().getLicenseFileDefinitions(),
@@ -61,8 +61,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return AppContext.inject(ConsolidatedLicense.class, new ConsolidatedLicense() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(ConsolidatedLicense.class, new ConsolidatedLicense() {
       {
         this.licenseFileName = "license";
         this.licenseText = Serializer.safeSerializeYaml(request);
@@ -74,8 +74,8 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return AppContext.inject(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
       {
         this.item = new ArrayList<>();
       }
@@ -86,9 +86,9 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
 
-    return AppContext.inject(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
+    return AppContext.injectResponse(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
       {
         this.item = new ArrayList<>();
       }
@@ -99,7 +99,7 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
 
     return Serializer.safeSerializeYaml(request);
 

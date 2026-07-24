@@ -1,16 +1,25 @@
 package com.revenera.gcs.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.LoggingFactory;
 
+@JsonPropertyOrder({
+    "className",
+    "methodName",
+    "lineNumber"
+})
 public class Frame {
   private static final LoggingFactory logger = LoggingFactory.create(Frame.class);
 
-  final StackTraceElement frame;
+  private final StackTraceElement frame;
 
   public Frame(final int depth) {
     this.frame = Thread.currentThread().getStackTrace()[depth + 2];
   }
 
+  @JsonIgnore
   public String getClassName() {
     return frame.getClassName();
   }
@@ -19,6 +28,7 @@ public class Frame {
     return frame.getMethodName();
   }
 
+  @JsonIgnore
   public String getFileName() {
     return frame.getFileName();
   }
@@ -27,6 +37,7 @@ public class Frame {
     return frame.getLineNumber();
   }
 
+  @JsonProperty("className")
   public String getSimpleClassName() {
     String classname = frame.getClassName();
     try {

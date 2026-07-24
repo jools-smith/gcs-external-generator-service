@@ -13,7 +13,7 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
 
   private final List<ExecutionRecord> records = new LinkedList<>();
 
-  private final Queue<Map.Entry<String, Object>> transactions = new ConcurrentLinkedQueue<>();
+  private final Queue<Map.Entry<Object, Object>> transactions = new ConcurrentLinkedQueue<>();
 
   @Override
   public List<ExecutionRecord> getRecords() {
@@ -43,7 +43,7 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
 
 
   @Override
-  public Map.Entry<String, Object> pollTransactions() {
+  public Map.Entry<Object, Object> pollTransactions() {
     return this.transactions.poll();
   }
 
@@ -63,8 +63,11 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
     return classname;
   }
 
+  enum TransTypes {
+    frame, start, duration, request, response, payload
+  }
   @Override
-  public void submitTransaction(final Frame frame, final Instant start, final List<Map.Entry<Class<?>, Object>> payload ) {
+  public void submitTransaction(final Frame frame, final Instant start, final Object request, final Object response,final List<Map.Entry<Class<?>, Object>> payload ) {
 
     final String classname = frame.getSimpleClassName();
     final String method = frame.getMethodName();
@@ -78,14 +81,21 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
         classname,
         method);
 
-    transactions.offer(new AbstractMap.SimpleEntry<>(key, new LinkedHashMap<String, Object>() {
+    transactions.offer(new AbstractMap.SimpleEntry<>(key, new LinkedHashMap<Object, Object>() {
       {
-        put("module", classname);
-        put("method", method);
-        put("line", frame.getLineNumber());
-        put("started", start.toString());
-        put("duration", Duration.between(Instant.now(), start).toNanos() / 1_000_000_000.0);
-        put("payload", payload);
+        put(TransTypes.frame, frame);
+        put(TransTypes.start, start.toString());
+        put(TransTypes.duration, Duration.between(Instant.now(), start).toNanos() / 1_000_000_000.0);
+
+        Optional.ofNullable(request).ifPresent(e -> put(TransTypes.request, request));
+
+        Optional.ofNullable(response).ifPresent(e -> put(TransTypes.response, response));
+
+        Optional.ofNullable(payload).ifPresent(e -> {
+          if (!payload.isEmpty()) {
+            put(TransTypes.payload, request);
+          }
+        });
       }
     }));
   }

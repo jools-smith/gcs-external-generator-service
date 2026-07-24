@@ -157,49 +157,49 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
   public PingResponse ping(final PingRequest request) {
     logger.in();
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
 
-    return AppContext.inject(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
+    return AppContext.injectResponse(PingResponse.class, request.getStr().equals("BIG") ? doPingResponse() : doMiniPingResponse());
   }
 
   @Override
   public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return new Status() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(Status.class, new Status() {
       {
         this.message = "product is validated | " + request.getName() + " | " + request.getVersion();
         this.code = 0;
       }
-    };
+    });
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
-    return new Status() {
+    AppContext.injectRequest(request);
+    return AppContext.injectResponse(Status.class, new Status() {
       {
         this.message = "license request is validated | " + request.getName();
         this.code = 0;
       }
-    };
+    });
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
     final String license = request.getFulfillments().stream().flatMap(fulfilment -> fulfilment.getLicenseFiles().stream()).filter(lfd -> String.class.isAssignableFrom(lfd.getValue().getClass())).map(lfd -> lfd.getValue().toString()).collect(Collectors.joining("\n"));
 
-    return new ConsolidatedLicense() {
+    return AppContext.injectResponse(ConsolidatedLicense.class, new ConsolidatedLicense() {
       {
         this.fulfillments = request.getFulfillments();
 
         request.getFulfillments().stream().findAny().ifPresent(fid -> this.licFiles =
             makeLicenseFiles(fid.getLicenseTechnology().getLicenseFileDefinitions(), license, null));
       }
-    };
+    });
   }
 
   private <T> T except(final Class<T> type, final String message) {
@@ -209,21 +209,21 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
     return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
     return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
 
-    AppContext.inject(request);
+    AppContext.injectRequest(request);
     return except(String.class, "generateCustomHostIdentifier not implemented");
   }
 }

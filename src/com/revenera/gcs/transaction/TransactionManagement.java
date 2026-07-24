@@ -8,6 +8,11 @@ import java.util.Map;
 
 public interface TransactionManagement {
   boolean hasTransactions();
-  Map.Entry<String, Object> pollTransactions();
-  void submitTransaction(final Frame frame, final Instant start, final List<Map.Entry<Class<?>, Object>> payload);
+  Map.Entry<Object, Object> pollTransactions();
+  void submitTransaction(
+      final Frame frame,
+      final Instant start,
+      final Object request,
+      final Object response,
+      final List<Map.Entry<Class<?>, Object>> payload);
 }

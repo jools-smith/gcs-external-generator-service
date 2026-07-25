@@ -15,6 +15,10 @@ public class Housekeeper {
   private ScheduledExecutorService scheduler = null;
   private final Map<Object, ScheduledFuture<?>> runners = new HashMap<>();
 
+  public Housekeeper() {
+    logger.me(this);
+  }
+
   void initialize() {
     try {
 

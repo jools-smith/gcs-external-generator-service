@@ -1,15 +1,17 @@
 package com.revenera.gcs.logging;
 
+import com.revenera.gcs.utils.Frame;
+
 import java.time.Instant;
 
-public class Context {
-  final StackTraceElement element;
-  final Level level;
+class Context {
   final Instant time = Instant.now();
+  final Level level;
+  final Frame frame;
 
-  Context(final Level level, final StackTraceElement element) {
+  Context(final Level level, final short depth) {
     this.level = level;
-    this.element = element; 
+    this.frame = new Frame(depth);
   }
   
   public Level getLevel() {
@@ -26,16 +28,16 @@ public class Context {
 
   public String getClassName() {
     //
-    return this.element.getClassName();
+    return this.frame.getClassName();
   }
 
   public String getMethodName () {
     //
-    return this.element.getMethodName();
+    return this.frame.getMethodName();
   }
 
   int getLineNumber(){
     //
-    return this.element.getLineNumber();
+    return this.frame.getLineNumber();
   }
 }

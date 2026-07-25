@@ -3,6 +3,7 @@ package com.revenera.gcs;
 import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
+import com.revenera.gcs.utils.Frame;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ public class Beans {
   static String web_inf;
 
   static {
+    logger.in();
     stopwatch.start();
     applicationProperties = new ApplicationProperties();
     implementorFactory = new ImplementorFactory();
@@ -39,6 +41,6 @@ public class Beans {
   }
 
   public static AppContext makeContext() {
-    return new AppContext(2);
+    return new AppContext(Frame.TWO);
   }
 }

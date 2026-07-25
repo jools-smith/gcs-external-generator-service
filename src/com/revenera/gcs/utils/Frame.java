@@ -11,12 +11,19 @@ import com.revenera.gcs.logging.LoggingFactory;
     "lineNumber"
 })
 public class Frame {
+  public static final short ONE = 1;
+  public static final short TWO = 2;
+  public static final short THREE = 3;
+  public static final short FOUR = 4;
+  public static final short FIVE = 5;
+
+
   private static final LoggingFactory logger = LoggingFactory.create(Frame.class);
 
   private final StackTraceElement frame;
 
-  public Frame(final int depth) {
-    this.frame = Thread.currentThread().getStackTrace()[depth + 2];
+  public Frame(final short depth) {
+    this.frame = Thread.currentThread().getStackTrace()[depth];
   }
 
   @JsonIgnore

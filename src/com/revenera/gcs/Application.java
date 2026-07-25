@@ -51,17 +51,15 @@ public class Application implements
   }
 
   public Application() {
-    logger.in();
+    logger.me(this);
     try (final AppContext ctx = Beans.makeContext()) {
-      logger.me(this);
-
       logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
     }
     finally {
-      logger.out();
+//      logger.out();
     }
   }
 
@@ -149,34 +147,41 @@ public class Application implements
     try (final AppContext ctx = Beans.makeContext()) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
-      final AnnotationManager manager = new AnnotationManager();
+      try (final AnnotationManager manager = new AnnotationManager()) {
 
-      final List<String> files = manager.findClassFilesInPackage(GeneratorBase.class);
+        final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
 
-      for (final String typename : files) {
+        for (final String typename : files) {
 
-        final Class<?> type = Class.forName(typename);
+          final Class<?> type = Class.forName(typename);
 
-        if (type.isAnnotationPresent(GeneratorImplementor.class)) {
+          if (type.isAnnotationPresent(GeneratorImplementor.class)) {
 
-          final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
+            final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-          logger.info().log("found annotation",
-              annotation.technologyId(),
-              annotation.technologyName(),
-              annotation.isDefault(),
-              type.getName());
+            logger.info().log("found implementor",
+                annotation.technologyId(),
+                annotation.technologyName(),
+                annotation.isDefault(),
+                type.getSimpleName());
 
-          if (GeneratorBase.class.isAssignableFrom(type)) {
+            if (GeneratorBase.class.isAssignableFrom(type)) {
 
-            final GeneratorBase imp = (GeneratorBase) type.newInstance();
+              final GeneratorBase imp = (GeneratorBase) type.newInstance();
 
-            imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
+              imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 
-            AppContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
+              AppContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
+            }
+            else {
+              logger.error().log("invalid implementor",
+                  annotation.technologyId(),
+                  annotation.technologyName(),
+                  type.getSimpleName());
+            }
           }
         }
-      }
+      } // close annotation manager
 
       final LicenseGeneratorServiceInterface implementor = AppContext.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {

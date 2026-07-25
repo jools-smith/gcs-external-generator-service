@@ -15,6 +15,10 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
 
   private final Queue<Map.Entry<Object, Object>> transactions = new ConcurrentLinkedQueue<>();
 
+  public DiagnosticsFactory() {
+    logger.me(this);
+  }
+
   @Override
   public List<ExecutionRecord> getRecords() {
     return this.records;
@@ -50,17 +54,6 @@ public class DiagnosticsFactory implements TransactionManagement, ExecutionManag
   @Override
   public boolean hasTransactions() {
     return !this.transactions.isEmpty();
-  }
-
-  private static String getSimpleClassName(final StackTraceElement frame) {
-    String classname = frame.getClassName();
-    try {
-      classname = Class.forName(frame.getClassName()).getSimpleName();
-    }
-    catch (final ClassNotFoundException e) {
-      logger.exception(e);
-    }
-    return classname;
   }
 
   enum TransTypes {

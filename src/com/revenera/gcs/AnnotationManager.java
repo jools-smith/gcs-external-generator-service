@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AnnotationManager {
+public class AnnotationManager implements AutoCloseable {
   static final String class_suffix = ".class";
 
   private final String root;
@@ -54,13 +54,10 @@ public class AnnotationManager {
             .replace(File.separator, ".");
   }
 
-  public List<String> findClassFilesInPackage(final Class<?> type) throws IOException, URISyntaxException {
+  public List<String> findClassFilesInPackage(final Path path) throws IOException, URISyntaxException {
 
     final List<File> files = new ArrayList<>();
 
-    final String packageName = type.getPackage().getName();
-
-    final Path path = Paths.get(packageName.replace(".", "/"));
 
     final Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path.toString());
 
@@ -69,5 +66,10 @@ public class AnnotationManager {
     }
 
     return files.stream().map(this::fileToPackageName).collect(Collectors.toList());
+  }
+
+  @Override
+  public void close()  {
+    //TODO:this is an experiment and not needed
   }
 }

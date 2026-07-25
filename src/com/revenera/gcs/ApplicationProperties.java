@@ -1,5 +1,7 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.logging.LoggingFactory;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -9,6 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class ApplicationProperties {
+  private static final LoggingFactory logger = LoggingFactory.create(ApplicationProperties.class);
+
   enum Items {
     TIMESTAMP("build.timestamp"),
     VERSION_MAJOR("build.version.major"),
@@ -32,6 +36,8 @@ public final class ApplicationProperties {
   private final Map<Items,Object> properties = new LinkedHashMap<>();
 
   public ApplicationProperties() {
+    logger.me(this);
+
     try {
       final Properties props = new Properties();
       props.load(Beans.class.getResourceAsStream("/revenera.properties"));

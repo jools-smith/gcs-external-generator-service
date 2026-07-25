@@ -52,8 +52,8 @@ public class AppContext implements AutoCloseable {
 
   static final ThreadLocal<Transaction> context = new ThreadLocal<>();
 
-  AppContext(final int depth) {
-    context.set(new Transaction(new Frame(depth)));
+  AppContext(final short depth) {
+    context.set(new Transaction(new Frame((short)(depth + 2))));
   }
 
   @Override
@@ -76,7 +76,7 @@ public class AppContext implements AutoCloseable {
   }
 
   public static void injectRequest(final Object data) {
-    context.get().request = new DataObject(new Frame(1), data);
+    context.get().request = new DataObject(new Frame(Frame.THREE), data);
   }
 
   public static void injectPayload(final Object data) {
@@ -86,14 +86,14 @@ public class AppContext implements AutoCloseable {
       ctx.payload = new LinkedList<>();
     }
 
-    ctx.payload.add(new DataObject(new Frame(1), data));
+    ctx.payload.add(new DataObject(new Frame(Frame.THREE), data));
   }
 
   public static <T> T injectResponse(final Class<T> type, final T data) {
 
     final Class<?> clazz = type.equals(data.getClass().getSuperclass()) ? type : data.getClass();
 
-    context.get().response = new DataObject(new Frame(1), data, clazz);
+    context.get().response = new DataObject(new Frame(Frame.THREE), data, clazz);
 
     return data;
   }

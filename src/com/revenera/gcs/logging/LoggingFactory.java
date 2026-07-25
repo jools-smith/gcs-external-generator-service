@@ -1,5 +1,6 @@
 package com.revenera.gcs.logging;
 
+import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 
 import java.time.Instant;
@@ -118,73 +119,70 @@ public class LoggingFactory {
 
   public ILogging error() {
     return new SimpleLoggingImplementor(
-        new Context(Level.ERROR, new Throwable().getStackTrace()[1]));
+        new Context(Level.ERROR, Frame.FOUR));
   }
 
   public ILogging warning() {
     return new SimpleLoggingImplementor(
-        new Context(Level.WARNING, new Throwable().getStackTrace()[1]));
+        new Context(Level.WARNING, Frame.FOUR));
   }
 
   public ILogging info() {
     return new SimpleLoggingImplementor(
-        new Context(Level.INFO, new Throwable().getStackTrace()[1]));
+        new Context(Level.INFO, Frame.FOUR));
   }
 
   public ILogging debug() {
     return new SimpleLoggingImplementor(
-        new Context(Level.DEBUG, new Throwable().getStackTrace()[1]));
+        new Context(Level.DEBUG, Frame.FOUR));
   }
 
   public ILogging verbose() {
     return new SimpleLoggingImplementor(
-        new Context(Level.TRACE, new Throwable().getStackTrace()[1]));
+        new Context(Level.TRACE, Frame.FOUR));
   }
 
   public ILogging get(final Level level) {
     return new SimpleLoggingImplementor(
-        new Context(level, new Throwable().getStackTrace()[1]));
+        new Context(level, Frame.FOUR));
   }
 
   public void in() {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, new Throwable().getStackTrace()[1])).log("-->");
+        new Context(Level.TRACE, Frame.FOUR)).log("-->");
   }
 
   public void in(final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, new Throwable().getStackTrace()[1])).log(
-        "-->",
-        obj.getClass().getName(),
-        Serializer.safeSerializeYaml(obj));
+        new Context(Level.TRACE, Frame.FOUR)).log(
+            "-->",  obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
   public void out() {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, new Throwable().getStackTrace()[1])).log("<--");
+        new Context(Level.TRACE, Frame.FOUR)).log("<--");
   }
 
   public void json(final Level level, final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(level, new Throwable().getStackTrace()[1])).log(
-        obj.getClass().getName(),
-        Serializer.safeSerializeJsonIndented(obj));
+        new Context(level, Frame.FOUR)).log(
+            obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(level, new Throwable().getStackTrace()[1])).log(
-        obj.getClass().getName(),
-        Serializer.safeSerializeYaml(obj));
+        new Context(level, Frame.FOUR)).log(
+            obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
   public void me(final Object obj) {
-    //TODO
+    new SimpleLoggingImplementor(
+        new Context(Level.TRACE, Frame.FOUR)).log(String.format("%08X", obj.hashCode()));
   }
 
   public void exception(final Throwable t) {
     new SimpleLoggingImplementor(
-        new Context(Level.ERROR, new Throwable().getStackTrace()[1])).log(t);
+        new Context(Level.ERROR, Frame.FOUR)).log(t);
   }
 
   public Class<?> getType() {

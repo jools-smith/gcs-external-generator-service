@@ -83,12 +83,16 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
             AppContext.getApplicationProperties().getTime());
 
         this.processedTime = Instant.now().toString();
+
+        final String implementors = String.join(" | ", AppContext.getImplementorFactory().getImplementors());
+
         this.info = String.join(" | ",
             SystemProperties.getOsName(),
             SystemProperties.getOsVersion(),
             SystemProperties.getOsArch(),
             SystemUtils.getHostName(),
-            SystemProperties.getUserName("unknown"));
+            SystemProperties.getUserName("unknown"),
+            implementors);
       }
     };
   }

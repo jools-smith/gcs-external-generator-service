@@ -8,11 +8,9 @@ import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -31,13 +29,14 @@ public class Application implements ServletContextListener {
   private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
   static {
+
     try (final AppContext ctx = Beans.makeContext()) {
       final Level level = Level.valueOf(
           AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
       LoggingFactory.setLoggingLevel(level);
 
-      logger.verbose().log("set logging level to", level.toString());
+      logger.info().log("set logging level to", level);
     }
     catch (final Throwable t) {
       logger.exception(t);

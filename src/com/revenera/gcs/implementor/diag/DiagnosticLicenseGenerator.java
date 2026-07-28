@@ -14,8 +14,12 @@ import java.util.ArrayList;
 public final class DiagnosticLicenseGenerator extends GeneratorBase {
 
   @Override
-  public Status validateProduct(final ProductRequest product) {
+  public PingResponse ping(final PingRequest request) {
+    return super.ping(request);
+  }
 
+  @Override
+  public Status validateProduct(final ProductRequest product) {
     AppContext.injectRequest(product);
     return AppContext.injectResponse(Status.class, new Status() {
       {
@@ -23,12 +27,10 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
         this.code = 0;
       }
     });
-
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-
     AppContext.injectRequest(request);
     return AppContext.injectResponse(Status.class, new Status() {
       {
@@ -36,12 +38,10 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
         this.code = 0;
       }
     });
-
   }
 
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) throws LicGeneratorException {
-
     AppContext.injectRequest(request);
     return AppContext.injectResponse(GeneratorResponse.class, new GeneratorResponse() {
       {
@@ -55,12 +55,10 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
         setLicenseFileName("nofile.txt");
       }
     });
-
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-
     AppContext.injectRequest(request);
     return AppContext.injectResponse(ConsolidatedLicense.class, new ConsolidatedLicense() {
       {
@@ -68,41 +66,31 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase {
         this.licenseText = Serializer.safeSerializeYaml(request);
       }
     });
-
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-
     AppContext.injectRequest(request);
     return AppContext.injectResponse(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
       {
         this.item = new ArrayList<>();
       }
     });
-
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-
     AppContext.injectRequest(request);
-
     return AppContext.injectResponse(LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap() {
       {
         this.item = new ArrayList<>();
       }
     });
-
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-
-    AppContext.injectRequest(request);
-
-    return Serializer.safeSerializeYaml(request);
-
+    return super.generateCustomHostIdentifier(request);
   }
 }
 

@@ -13,6 +13,11 @@ class Context {
     this.level = level;
     this.frame = new Frame(depth);
   }
+
+  Context(final Level level, final String fqcn) {
+    this.level = level;
+    this.frame = new Frame(fqcn);
+  }
   
   public Level getLevel() {
     //

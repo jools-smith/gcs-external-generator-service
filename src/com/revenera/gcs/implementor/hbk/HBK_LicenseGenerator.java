@@ -33,6 +33,11 @@ public class HBK_LicenseGenerator extends GeneratorBase {
       date == null ? Instant.now().toString() : date.toXMLFormat();
 
   @Override
+  public PingResponse ping(final PingRequest request) {
+    return super.ping(request);
+  }
+
+  @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
     try {
@@ -166,5 +171,32 @@ public class HBK_LicenseGenerator extends GeneratorBase {
       logger.exception(t);
       throw new RuntimeException(t);
     }
+  }
+
+  // DELEGATE
+
+  @Override
+  public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
+    return super.validateProduct(request);
+  }
+
+  @Override
+  public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
+    return super.validateLicenseModel(request);
+  }
+
+  @Override
+  public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
+    return super.generateLicenseFilenames(request);
+  }
+
+  @Override
+  public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
+    return super.generateConsolidatedLicenseFilenames(request);
+  }
+
+  @Override
+  public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
+    return super.generateCustomHostIdentifier(request);
   }
 }

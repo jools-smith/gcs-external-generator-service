@@ -36,6 +36,7 @@ public class LoggingFactory {
   }
 
   final Class<?> type;
+  final String fqcn;
 
   // implementor
   class SimpleLoggingImplementor implements ILogging {
@@ -53,11 +54,12 @@ public class LoggingFactory {
             this.context.getLevel().getText(),
             Thread.currentThread().getName(),
             LoggingFactory.this.type.getSimpleName(),
-            abbreviatePackageName(this.context.getClassName(), 32),
+            abbreviatePackageName(this.context.getClassName(), 48),
             this.context.getMethodName(),
             this.context.getLineNumber(),
             message);
 
+        // rely on stdout redirection in Tomcat...
         System.out.println(content);
 
         if (willLog(this.context.level)) {
@@ -112,82 +114,77 @@ public class LoggingFactory {
     return str;
   }
 
+
   LoggingFactory(Class<?> type) {
-    //
     this.type = type;
+    this.fqcn = type.getCanonicalName();
   }
 
   public ILogging error() {
     return new SimpleLoggingImplementor(
-        new Context(Level.ERROR, Frame.FOUR));
+        new Context(Level.ERROR, this.fqcn));
   }
 
   public ILogging warning() {
     return new SimpleLoggingImplementor(
-        new Context(Level.WARNING, Frame.FOUR));
+        new Context(Level.WARNING, this.fqcn));
   }
 
   public ILogging info() {
     return new SimpleLoggingImplementor(
-        new Context(Level.INFO, Frame.FOUR));
+        new Context(Level.INFO, this.fqcn));
   }
 
   public ILogging debug() {
     return new SimpleLoggingImplementor(
-        new Context(Level.DEBUG, Frame.FOUR));
+        new Context(Level.DEBUG, this.fqcn));
   }
 
   public ILogging verbose() {
     return new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR));
+        new Context(Level.TRACE, this.fqcn));
   }
 
   public ILogging trace() {
     return new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR));
+        new Context(Level.TRACE, this.fqcn));
   }
 
   public ILogging get(final Level level) {
     return new SimpleLoggingImplementor(
-        new Context(level, Frame.FOUR));
+        new Context(level, this.fqcn));
   }
 
   public void in() {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR)).log("-->");
-  }
-
-  public void in(final Object obj) {
-    new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR)).log(
-            "-->",  obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
+        new Context(Level.TRACE, this.fqcn)).log("-->");
   }
 
   public void out() {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR)).log("<--");
+        new Context(Level.TRACE, this.fqcn)).log("<--");
   }
 
   public void json(final Level level, final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(level, Frame.FOUR)).log(
+        new Context(level, this.fqcn)).log(
             obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(level, Frame.FOUR)).log(
+        new Context(level, this.fqcn)).log(
             obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
   public void me(final Object obj) {
     new SimpleLoggingImplementor(
-        new Context(Level.TRACE, Frame.FOUR)).log(String.format("%08X", obj.hashCode()));
+        new Context(Level.TRACE, this.fqcn)).log(String.format("%08X", obj.hashCode()));
   }
 
   public void exception(final Throwable t) {
     new SimpleLoggingImplementor(
-        new Context(Level.ERROR, Frame.FOUR)).log(t);
+        new Context(Level.ERROR, this.fqcn)).log(t);
   }
 
   public Class<?> getType() {

@@ -1,5 +1,8 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.listeners.RequestListener;
+import com.revenera.gcs.logging.LoggingFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,11 +13,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnnotationManager implements AutoCloseable {
+  private static final LoggingFactory logger = LoggingFactory.create(AnnotationManager.class);
+
   static final String class_suffix = ".class";
 
   private final String root;
 
   public AnnotationManager() throws URISyntaxException {
+    logger.me(this);
+
     final URL url = Objects.requireNonNull(
             Thread.currentThread()
                     .getContextClassLoader()

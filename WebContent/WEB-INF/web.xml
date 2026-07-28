@@ -1,24 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, 
-Inc.//DTD Web Application 2.3//EN"
-"http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
 
 <web-app>
+    <!--
     <listener>
-        <!--
-        <listener-class>
-            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
-        </listener-class>
-        -->
         <listener-class>
             com.revenera.gcs.Application
         </listener-class>
     </listener>
-<!--    <listener>-->
-<!--        <listener-class>-->
-<!--            com.revenera.gcs.Application-->
-<!--        </listener-class>-->
-<!--    </listener>-->
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.listeners.SessionIdListener
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.SessionAttributeListener
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.listeners.SessionListener
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.listeners.RequestAttributeListener
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.listeners.RequestListener
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            com.revenera.gcs.listeners.ContextAttributeListener
+        </listener-class>
+    </listener>
+    -->
+
     <servlet>
         <servlet-name>genServices</servlet-name>
         <servlet-class>
@@ -34,3 +62,4 @@ Inc.//DTD Web Application 2.3//EN"
         <session-timeout>120</session-timeout>
     </session-config>
 </web-app>
+

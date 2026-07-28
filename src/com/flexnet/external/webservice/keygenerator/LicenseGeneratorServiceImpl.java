@@ -12,24 +12,6 @@ import javax.jws.WebService;
 )
 public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseGeneratorServiceInterface {
 
-//  public PingResponse ping1(final PingRequest payload) throws LicGeneratorException {
-
-  /// /    logger.in(payload);
-//    try (final AppContext ctx = Beans.makeContext()) {
-//      try (final ExecutionScope context = AppContext.getExecutionManager().makeExecutionScope()) {
-//        logger.json(Level.DEBUG, payload);
-//        final String tech = ServiceHelper.getLicenseTechnology(payload);
-//
-//        return AppContext
-//            .getImplementorFactory()
-//            .getImplementor(tech)
-//            .ping(payload);
-//      }
-//    }
-//    catch (final Throwable t) {
-//      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
-//    }
-//  }
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
 //    logger.in(payload);

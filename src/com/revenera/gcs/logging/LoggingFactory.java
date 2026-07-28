@@ -142,6 +142,11 @@ public class LoggingFactory {
         new Context(Level.TRACE, Frame.FOUR));
   }
 
+  public ILogging trace() {
+    return new SimpleLoggingImplementor(
+        new Context(Level.TRACE, Frame.FOUR));
+  }
+
   public ILogging get(final Level level) {
     return new SimpleLoggingImplementor(
         new Context(level, Frame.FOUR));

@@ -9,8 +9,10 @@ import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -20,19 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * The root of the service, registered as a listener will set stuff up when the context is initialized
  */
 @WebListener
-public class Application implements
-    ServletContextListener,
-    ServletContextAttributeListener,
-    ServletRequestListener,
-    ServletRequestAttributeListener,
-    HttpSessionListener,
-    HttpSessionAttributeListener,
-    HttpSessionIdListener {
+public class Application implements ServletContextListener {
 
   private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
@@ -50,6 +44,8 @@ public class Application implements
     }
   }
 
+  private final Housekeeper housekeeper = new Housekeeper();
+
   public Application() {
     logger.me(this);
     try (final AppContext ctx = Beans.makeContext()) {
@@ -58,13 +54,7 @@ public class Application implements
     catch (final Throwable t) {
       logger.exception(t);
     }
-    finally {
-//      logger.out();
-    }
   }
-
-
-  private final Housekeeper housekeeper = new Housekeeper();
 
   private void serializeToLogPath(final String filename, final List<String> content) {
     try {
@@ -90,11 +80,7 @@ public class Application implements
       while (AppContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
         final Map.Entry<Object, Object> content = AppContext.getTransactionManager().pollTransactions();
-//        if (content != null) {
-//          serializeToLogPath(content.getKey() + ".json",
-//              Collections.singletonList(
-//                  Serializer.safeSerializeJsonIndented(content.getValue())));
-//        }
+
         if (content != null) {
           serializeToLogPath(content.getKey() + ".yaml",
               Collections.singletonList(
@@ -221,93 +207,5 @@ public class Application implements
     finally {
       logger.out();
     }
-  }
-
-  /*
-   * ServletContextAttributeListener
-   */
-  @Override
-  public void attributeAdded(ServletContextAttributeEvent servletContextAttributeEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeRemoved(ServletContextAttributeEvent servletContextAttributeEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeReplaced(ServletContextAttributeEvent servletContextAttributeEvent) {
-    logger.in();
-  }
-
-  /*
-   * ServletContextAttributeListener
-   */
-  @Override
-  public void requestDestroyed(ServletRequestEvent request) {
-    logger.in();
-  }
-
-  @Override
-  public void requestInitialized(ServletRequestEvent request) {
-    logger.in();
-  }
-
-  /*
-   * ServletRequestAttributeListener
-   */
-  @Override
-  public void attributeAdded(ServletRequestAttributeEvent servletRequestAttributeEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeRemoved(ServletRequestAttributeEvent servletRequestAttributeEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeReplaced(ServletRequestAttributeEvent servletRequestAttributeEvent) {
-    logger.in();
-  }
-
-  /*
-   * HttpSessionListener
-   */
-  @Override
-  public void sessionCreated(HttpSessionEvent httpSessionEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-    logger.in();
-  }
-
-  /*
-   * HttpSessionAttributeListener
-   */
-  @Override
-  public void attributeAdded(HttpSessionBindingEvent httpSessionBindingEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeRemoved(HttpSessionBindingEvent httpSessionBindingEvent) {
-    logger.in();
-  }
-
-  @Override
-  public void attributeReplaced(HttpSessionBindingEvent httpSessionBindingEvent) {
-    logger.in();
-  }
-
-  /*
-   * HttpSessionIdListener
-   */
-  @Override
-  public void sessionIdChanged(HttpSessionEvent httpSessionEvent, String s) {
-    logger.in();
   }
 }

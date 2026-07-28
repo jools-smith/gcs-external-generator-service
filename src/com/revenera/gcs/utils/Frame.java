@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.LoggingFactory;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 @JsonPropertyOrder({
     "className",
     "methodName",
@@ -25,6 +28,22 @@ public class Frame {
   public Frame(final short depth) {
     this.frame = Thread.currentThread().getStackTrace()[depth];
   }
+
+  public Frame(final String fqcn) {
+    this.frame = getFrame(fqcn);
+  }
+
+  private StackTraceElement getFrame(final String fqcn) {
+    final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    for (short i = 2; i < stack.length; i++) {
+      if (stack[i].getClassName().equals(fqcn)) {
+        return stack[i];
+      }
+    }
+    throw new IllegalArgumentException("No frame found for " + fqcn);
+  }
+
+
 
   @JsonIgnore
   public String getClassName() {

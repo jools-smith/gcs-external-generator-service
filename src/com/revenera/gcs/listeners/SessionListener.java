@@ -1,7 +1,5 @@
 package com.revenera.gcs.listeners;
 
-import com.revenera.gcs.AppContext;
-import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.annotation.WebListener;
@@ -28,5 +26,4 @@ public class SessionListener implements HttpSessionListener {
   public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
     logger.in();
   }
-
 }

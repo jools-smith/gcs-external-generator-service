@@ -187,6 +187,7 @@ public class Application implements ServletContextListener {
     catch (final Throwable t) {
       logger.exception(t);
     }
+    logger.out();
   }
 
   private enum Timers {

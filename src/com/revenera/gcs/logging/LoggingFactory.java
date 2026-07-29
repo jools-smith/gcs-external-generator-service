@@ -1,69 +1,53 @@
 package com.revenera.gcs.logging;
 
-import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
+import org.apache.commons.lang3.ClassUtils;
 
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+
 public class LoggingFactory {
-  static final Object lock = new Object();
+  final static DateTimeFormatter formatter = DateTimeFormatter
+      .ofPattern("dd-MMM-yyyy HH:mm:ss.SSS", Locale.ENGLISH)
+      .withZone(ZoneId.systemDefault());
 
-  final static Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
+  final static DateTimeFormatter formatterZulu =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+          .withZone(ZoneId.systemDefault());
 
-  final static AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
+  // genuinely is an inner class, cannot be static
+  private class InnerLogging extends LoggingContext implements ILogging {
+//    final Instant time = Instant.now();
+//    final LoggingContext context;
 
-//  final static AtomicReference<String> loggingRoot = new AtomicReference<>("c:\\revenera");
-
-  public static boolean willLog(final Level level) {
-    return loggingLevel.get().compare(level) >= 0;
-  }
-
-  public static Level setLoggingLevel(final Level level) {
-    return loggingLevel.getAndSet(level);
-  }
-
-  public static boolean hasMessages() {
-    return !messageQueue.isEmpty();
-  }
-
-  public static String pollMessageQueue() {
-    return messageQueue.poll();
-  }
-
-  final Class<?> type;
-  final String fqcn;
-
-  // implementor
-  class SimpleLoggingImplementor implements ILogging {
-    final Instant time = Instant.now();
-    final Context context;
-    
-    private SimpleLoggingImplementor(final Context context) {
-      this.context = context;
+    InnerLogging(final Level level) {
+      super(level, LoggingFactory.this.type.getCanonicalName());
     }
 
     private void post(final String message) {
-      synchronized (lock) {
-        final String content = String.format("%s %5s [%s] {%s} %s.%s(%d) %s",
-            this.context.getTimeUtc(),
-            this.context.getLevel().getText(),
+      synchronized (LoggingFactory.lock) {
+        final String content = String.format("%s %5s [%s] %s.%s(%d) {%s} %s",
+            formatter.format(getTime()),
+            getLevel().getText(),
             Thread.currentThread().getName(),
+            ClassUtils.getAbbreviatedName(getClassName(), 32),
+            getMethodName(),
+            getLineNumber(),
             LoggingFactory.this.type.getSimpleName(),
-            abbreviatePackageName(this.context.getClassName(), 48),
-            this.context.getMethodName(),
-            this.context.getLineNumber(),
             message);
 
         // rely on stdout redirection in Tomcat...
         System.out.println(content);
 
-        if (willLog(this.context.level)) {
-          messageQueue.add(content);
+        if (LoggingFactory.willLog(level)) {
+          LoggingFactory.messageQueue.add(content);
         }
       }
     }
@@ -94,97 +78,92 @@ public class LoggingFactory {
     }
   }
 
-  public static String abbreviatePackageName(final String name, final int limit) {
+  static final Object lock = new Object();
 
-    String str = name;
+  final static Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
 
-    if (str.length() > limit) {
-      final String[] parts = name.split("\\.");
+  final static AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
 
-      for (int i = 0; i < parts.length; i++) {
-        parts[i] = parts[i].substring(0, 1);
-
-        str = String.join(".", parts);
-        if (str.length() <= limit) {
-          break;
-        }
-      }
-    }
-
-    return str;
+  public static boolean willLog(final Level level) {
+    return loggingLevel.get().compare(level) >= 0;
   }
+
+  public static void setLoggingLevel(final Level level) {
+    loggingLevel.getAndSet(level);
+  }
+
+  public static Level getLoggingLevel() {
+    return loggingLevel.get();
+  }
+
+  public static boolean hasMessages() {
+    return !messageQueue.isEmpty();
+  }
+
+  public static String pollMessageQueue() {
+    return messageQueue.poll();
+  }
+
+  final Class<?> type;
 
 
   LoggingFactory(Class<?> type) {
     this.type = type;
-    this.fqcn = type.getCanonicalName();
   }
 
   public ILogging error() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.ERROR, this.fqcn));
+    return new InnerLogging(Level.ERROR);
   }
 
   public ILogging warning() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.WARNING, this.fqcn));
+    return new InnerLogging(Level.WARNING);
   }
 
   public ILogging info() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.INFO, this.fqcn));
+    return new InnerLogging(Level.INFO);
   }
 
   public ILogging debug() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.DEBUG, this.fqcn));
+    return new InnerLogging(Level.DEBUG);
   }
 
   public ILogging verbose() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.TRACE, this.fqcn));
+    return new InnerLogging(Level.TRACE);
   }
 
   public ILogging trace() {
-    return new SimpleLoggingImplementor(
-        new Context(Level.TRACE, this.fqcn));
+    return new InnerLogging(Level.TRACE);
   }
 
   public ILogging get(final Level level) {
-    return new SimpleLoggingImplementor(
-        new Context(level, this.fqcn));
+    return new InnerLogging(level);
   }
 
   public void in() {
-    new SimpleLoggingImplementor(
-        new Context(Level.TRACE, this.fqcn)).log("-->");
+    new InnerLogging(Level.TRACE).log("-->");
   }
 
   public void out() {
-    new SimpleLoggingImplementor(
-        new Context(Level.TRACE, this.fqcn)).log("<--");
+    new InnerLogging(Level.TRACE).log("<--");
   }
 
   public void json(final Level level, final Object obj) {
-    new SimpleLoggingImplementor(
-        new Context(level, this.fqcn)).log(
-            obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
+    new InnerLogging(level)
+        .log(obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
-    new SimpleLoggingImplementor(
-        new Context(level, this.fqcn)).log(
-            obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
+    new InnerLogging(level)
+        .log(obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
   public void me(final Object obj) {
-    new SimpleLoggingImplementor(
-        new Context(Level.TRACE, this.fqcn)).log(String.format("%08X", obj.hashCode()));
+    new InnerLogging(Level.TRACE)
+        .log(String.format("%08X", obj.hashCode()));
   }
 
   public void exception(final Throwable t) {
-    new SimpleLoggingImplementor(
-        new Context(Level.ERROR, this.fqcn)).log(t);
+    new InnerLogging(Level.ERROR).log(t);
   }
 
   public Class<?> getType() {

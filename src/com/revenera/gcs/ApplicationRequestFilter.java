@@ -10,16 +10,16 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 @WebFilter(urlPatterns = "/services/*")
-public class RequestFilter implements Filter {
-  private static final LoggingFactory logger = LoggingFactory.create(RequestFilter.class);
+public class ApplicationRequestFilter implements Filter {
+  private static final LoggingFactory logger = LoggingFactory.create(ApplicationRequestFilter.class);
   
-  public RequestFilter() {
+  public ApplicationRequestFilter() {
     logger.me(this);
   }
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
-    logger.info().log(config.getFilterName());
+    logger.debug().log(config.getFilterName(), config.getServletContext().getMajorVersion(), config.getServletContext().getMinorVersion());
 
     final Enumeration<String> itt = config.getInitParameterNames();
     while (itt.hasMoreElements()) {

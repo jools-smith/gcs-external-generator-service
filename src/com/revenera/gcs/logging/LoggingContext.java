@@ -4,17 +4,17 @@ import com.revenera.gcs.utils.Frame;
 
 import java.time.Instant;
 
-class Context {
+class LoggingContext {
   final Instant time = Instant.now();
   final Level level;
   final Frame frame;
 
-  Context(final Level level, final short depth) {
+  LoggingContext(final Level level, final short depth) {
     this.level = level;
     this.frame = new Frame(depth);
   }
 
-  Context(final Level level, final String fqcn) {
+  LoggingContext(final Level level, final String fqcn) {
     this.level = level;
     this.frame = new Frame(fqcn);
   }
@@ -31,8 +31,11 @@ class Context {
         .replace("Z", "");
   }
 
+  public Instant getTime() {
+    return this.time;
+  }
+
   public String getClassName() {
-    //
     return this.frame.getClassName();
   }
 

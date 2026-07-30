@@ -5,6 +5,7 @@ import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -30,7 +31,7 @@ public class Application implements ServletContextListener {
 
   static {
 
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx =new AppContext(Frame.ONE)) {
       final Level level = Level.valueOf(
           AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
@@ -47,7 +48,7 @@ public class Application implements ServletContextListener {
 
   public Application() {
     logger.me(this);
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx = Beans.makeContext(this)) {
       logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
@@ -74,7 +75,7 @@ public class Application implements ServletContextListener {
   }
 
   private void polling() {
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx = Beans.makeContext(this)) {
 
       while (AppContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
@@ -93,7 +94,7 @@ public class Application implements ServletContextListener {
   }
 
   private void logging() {
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx = Beans.makeContext(this)) {
 
       final List<String> messages = new ArrayList<>();
       while (LoggingFactory.hasMessages()) {
@@ -113,7 +114,7 @@ public class Application implements ServletContextListener {
   }
 
   private void housekeeping() {
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx = Beans.makeContext(this)) {
       //TODO:what is this supposed to do?
       logger.yaml(Level.DEBUG, AppContext.getExecutionManager().getRecords());
     }
@@ -129,7 +130,7 @@ public class Application implements ServletContextListener {
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
 
-    try (final AppContext ctx = Beans.makeContext()) {
+    try (final AppContext ctx = Beans.makeContext(this)) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
       try (final AnnotationManager manager = new AnnotationManager()) {

@@ -1,47 +1,77 @@
 package com.revenera.gcs.logging;
 
+import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.ClassUtils;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+
+import java.util.Formatter;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-
 public class LoggingFactory {
-  final static DateTimeFormatter formatter = DateTimeFormatter
+  static final DateTimeFormatter tomcat_formatter = DateTimeFormatter
       .ofPattern("dd-MMM-yyyy HH:mm:ss.SSS", Locale.ENGLISH)
       .withZone(ZoneId.systemDefault());
 
-  final static DateTimeFormatter formatterZulu =
+
+  static final DateTimeFormatter zulu_formatter =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
           .withZone(ZoneId.systemDefault());
 
+  static final Object lock = new Object();
+
+  static final Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
+
+  static final AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
+
   // genuinely is an inner class, cannot be static
-  private class InnerLogging extends LoggingContext implements ILogging {
-//    final Instant time = Instant.now();
-//    final LoggingContext context;
+  private class InnerLogging implements ILogging {
+    final Instant time = Instant.now();
+    final Level level;
+    final Frame frame;
 
     InnerLogging(final Level level) {
-      super(level, LoggingFactory.this.type.getCanonicalName());
+      this.level = level;
+      this.frame = new Frame(LoggingFactory.this.type);
+    }
+
+    private String makeLogMessage(final DateTimeFormatter timeFormatter, final String message) {
+
+      final Appendable appendable = new StringBuilder();
+
+      try (final Formatter formatter = new Formatter(appendable)) {
+
+        final String className = LoggingFactory.this.type.getCanonicalName().equals(this.frame.getClassName()) ?
+            LoggingFactory.this.type.getSimpleName() :
+            ClassUtils.getAbbreviatedName(this.frame.getClassName(), 32);
+
+        formatter.format("%s %5s [%s] %s %s (%d) %s",
+            timeFormatter.format(this.time),
+            this.level,
+            Thread.currentThread().getName(),
+            className,
+            this.frame.getMethodName(),
+            this.frame.getLineNumber(),
+            message);
+
+        formatter.flush();
+
+        return appendable.toString();
+      }
     }
 
     private void post(final String message) {
       synchronized (LoggingFactory.lock) {
-        final String content = String.format("%s %5s [%s] %s.%s(%d) {%s} %s",
-            formatter.format(getTime()),
-            getLevel().getText(),
-            Thread.currentThread().getName(),
-            ClassUtils.getAbbreviatedName(getClassName(), 32),
-            getMethodName(),
-            getLineNumber(),
-            LoggingFactory.this.type.getSimpleName(),
-            message);
+
+        final String content = makeLogMessage(tomcat_formatter, message);
 
         // rely on stdout redirection in Tomcat...
         System.out.println(content);
@@ -66,7 +96,7 @@ public class LoggingFactory {
     }
 
     @Override
-    public void log(Throwable t) {
+    public void log(final Throwable t) {
       final StackTraceElement frame = t.getStackTrace()[0];
 
       log(t.getClass().getName(),
@@ -78,11 +108,7 @@ public class LoggingFactory {
     }
   }
 
-  static final Object lock = new Object();
 
-  final static Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
-
-  final static AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
 
   public static boolean willLog(final Level level) {
     return loggingLevel.get().compare(level) >= 0;
@@ -105,7 +131,6 @@ public class LoggingFactory {
   }
 
   final Class<?> type;
-
 
   LoggingFactory(Class<?> type) {
     this.type = type;
@@ -167,12 +192,10 @@ public class LoggingFactory {
   }
 
   public Class<?> getType() {
-    ///
     return this.type;
   }
 
   public static LoggingFactory create(final Class<?> type) {
-    //
     return new LoggingFactory(type);
   }
 }

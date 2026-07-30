@@ -29,13 +29,17 @@ public class Frame {
     this.frame = Thread.currentThread().getStackTrace()[depth];
   }
 
-  public Frame(final String fqcn) {
-    this.frame = getFrame(fqcn);
+//  public Frame(final String fqcn) {
+//    this.frame = getFrame(fqcn);
+//  }
+
+  public Frame(final Class<?> type) {
+    this.frame = getFrame(type.getCanonicalName());
   }
 
   private StackTraceElement getFrame(final String fqcn) {
     final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-    for (short i = 2; i < stack.length; i++) {
+    for (short i = 0; i < stack.length; i++) {
       if (stack[i].getClassName().equals(fqcn)) {
         return stack[i];
       }

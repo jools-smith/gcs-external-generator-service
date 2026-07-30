@@ -41,7 +41,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
     try {
-      AppContext.injectRequest(request);
+      AppContext.injectRequest(this, request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
@@ -90,7 +90,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
       };
 
       //TODO:debug
-      AppContext.injectPayload(payload);
+      AppContext.injectPayload(this, payload);
 
       final String json = Serializer.safeSerializeJson(payload);
       logger.debug().log("payload", json);
@@ -118,7 +118,7 @@ public class HBK_LicenseGenerator extends GeneratorBase {
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return AppContext.injectResponse(GeneratorResponse.class, new GeneratorResponse() {
+        return AppContext.injectResponse(this, GeneratorResponse.class, new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -145,9 +145,9 @@ public class HBK_LicenseGenerator extends GeneratorBase {
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
     logger.in();
     try {
-      AppContext.injectRequest(request);
+      AppContext.injectRequest(this, request);
 
-      return AppContext.injectResponse(ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return AppContext.injectResponse(this, ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 

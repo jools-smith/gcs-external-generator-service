@@ -105,6 +105,7 @@ build.time=${build.time}
 build.category=GA
 build.username=${user.name}
 app.logging.level=TRACE
+app.logging.echo=ON
 app.housekeeping=10
         </echo>
     </target>

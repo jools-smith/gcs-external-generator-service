@@ -71,7 +71,6 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
     return this.technology.name;
   }
 
-
   private PingResponse doMiniPingResponse() {
 
     return new PingResponse() {
@@ -212,22 +211,16 @@ public abstract class GeneratorBase implements TechnologyProperties, LicenseGene
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-
-    AppContext.injectRequest(this, request);
     return except(LicenseFileDefinitionMap.class, "generateLicenseFilenames not implemented");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-
-    AppContext.injectRequest(this, request);
     return except(LicenseFileDefinitionMap.class, "generateConsolidatedLicenseFilenames not implemented");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-
-    AppContext.injectRequest(this, request);
     return except(String.class, "generateCustomHostIdentifier not implemented");
   }
 }

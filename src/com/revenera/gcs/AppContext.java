@@ -3,6 +3,7 @@ package com.revenera.gcs;
 import com.revenera.gcs.implementor.ImplementorManagement;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionManagement;
+import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
 import com.revenera.gcs.utils.Frame;
 import org.apache.commons.lang3.SystemProperties;
@@ -12,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class AppContext implements AutoCloseable {
@@ -181,7 +183,10 @@ public class AppContext implements AutoCloseable {
           }
         });
 
-        put("diagnostics", Beans.diagnosticsFactory.getRecords());
+        put("diagnostics", Beans.diagnosticsFactory.getRecords().stream()
+            .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
+            .collect(Collectors.toList()));
+
       }
     };
   }

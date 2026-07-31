@@ -7,6 +7,7 @@ import com.revenera.gcs.Beans;
 import javax.jws.WebService;
 
 @WebService(
+    serviceName = "revenera-gcs",
     endpointInterface = "com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface",
     wsdlLocation = "WEB-INF/wsdl/schema/LicenseGeneratorService.wsdl"
 )
@@ -47,12 +48,10 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 //    logger.in(payload);
     try (final AppContext ctx = Beans.makeContext(this)) {
 
-
       return AppContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateLicenseModel(payload);
-
     }
     catch (final Throwable t) {
       throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
@@ -63,7 +62,6 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public GeneratorResponse generateLicense(final GeneratorRequest payload) throws LicGeneratorException {
 //    logger.in(payload);
     try (final AppContext ctx = Beans.makeContext(this)) {
-
 
       return AppContext
           .getImplementorFactory()
@@ -85,7 +83,6 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .consolidateFulfillments(payload);
-
     }
     catch (final Throwable t) {
       throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
@@ -101,7 +98,6 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateLicenseFilenames(payload);
-
     }
     catch (final Throwable t) {
       throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));

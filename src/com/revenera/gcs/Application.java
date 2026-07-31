@@ -5,6 +5,7 @@ import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
@@ -15,11 +16,9 @@ import javax.servlet.annotation.WebListener;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * The root of the service, registered as a listener will set stuff up when the context is initialized
@@ -31,7 +30,7 @@ public class Application implements ServletContextListener {
 
   static {
 
-    try (final AppContext ctx =new AppContext(Frame.ONE)) {
+    try (final AppContext ctx = new AppContext(Frame.TWO)) {
       final Level level = Level.valueOf(
           AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
@@ -116,7 +115,10 @@ public class Application implements ServletContextListener {
   private void housekeeping() {
     try (final AppContext ctx = Beans.makeContext(this)) {
       //TODO:what is this supposed to do?
-      logger.yaml(Level.DEBUG, AppContext.getExecutionManager().getRecords());
+      logger.yaml(Level.DEBUG,
+          AppContext.getExecutionManager().getRecords().stream()
+              .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
+              .collect(Collectors.toList()));
     }
     catch (final Throwable t) {
       logger.exception(t);

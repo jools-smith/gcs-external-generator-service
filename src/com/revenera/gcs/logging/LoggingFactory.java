@@ -91,7 +91,7 @@ public class LoggingFactory {
     public void log(final Object... params) {
       post(Arrays
           .stream(params)
-          .map(Object::toString)
+          .map(x -> x == null ? "null" : x.toString())
           .collect(Collectors.joining(" | ")));
     }
 

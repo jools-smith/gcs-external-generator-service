@@ -3,10 +3,7 @@ package com.revenera.gcs;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +22,7 @@ public final class ApplicationProperties {
     RELEASE("build.category"),
 
     LOGGING_THRESHOLD("app.logging.level"),
+    LOGGING_ECHO("app.logging.echo"),
     HOUSEKEEPING_INTERVAL("app.housekeeping");
 
     final String name;
@@ -80,6 +78,11 @@ public final class ApplicationProperties {
 
   public String getLoggingLevel() {
     return this.properties.get(Items.LOGGING_THRESHOLD).toString();
+  }
+
+  public boolean getLoggingEcho() {
+    return Arrays.asList("true","on")
+        .contains(this.properties.get(Items.LOGGING_ECHO).toString().toLowerCase());
   }
 
   public String getUser() {

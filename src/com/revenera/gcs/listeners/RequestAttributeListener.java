@@ -7,6 +7,7 @@ import com.revenera.gcs.logging.LoggingFactory;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServletRequest;
 
 @WebListener
 public class RequestAttributeListener implements ServletRequestAttributeListener {
@@ -20,17 +21,33 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
    * ServletRequestAttributeListener
    */
   @Override
-  public void attributeAdded(ServletRequestAttributeEvent servletRequestAttributeEvent) {
+  public void attributeAdded(ServletRequestAttributeEvent event) {
     logger.in();
+    HttpServletRequest req = (HttpServletRequest) event.getServletRequest();
+
+    logger.debug().log(
+        req.getMethod(),
+        req.getRequestURI(),
+        req.getQueryString(),
+        req.getRemoteAddr(),
+        req.getHeader("User-Agent"),
+        req.getContextPath(),
+        req.getServletPath());
+
+    logger.debug().log(event.getName(), event.getValue());
+
+
   }
 
   @Override
-  public void attributeRemoved(ServletRequestAttributeEvent servletRequestAttributeEvent) {
+  public void attributeRemoved(ServletRequestAttributeEvent event) {
     logger.in();
+    logger.debug().log(event.getName(), event.getValue());
   }
 
   @Override
-  public void attributeReplaced(ServletRequestAttributeEvent servletRequestAttributeEvent) {
+  public void attributeReplaced(ServletRequestAttributeEvent event) {
     logger.in();
+    logger.debug().log(event.getName(), event.getValue());
   }
 }

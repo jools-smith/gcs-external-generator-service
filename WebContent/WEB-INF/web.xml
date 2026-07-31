@@ -3,49 +3,56 @@
         "http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
 
 <web-app>
+    <listener>
+        <listener-class>
+            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+        </listener-class>
+    </listener>
+
+
     <!--
-    <listener>
-        <listener-class>
-            com.revenera.gcs.Application
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.Application
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.listeners.SessionIdListener
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.listeners.SessionIdListener
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.SessionAttributeListener
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.SessionAttributeListener
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.listeners.SessionListener
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.listeners.SessionListener
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.listeners.RequestAttributeListener
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.listeners.RequestAttributeListener
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.listeners.RequestListener
-        </listener-class>
-    </listener>
+        <listener>
+            <listener-class>
+                com.revenera.gcs.listeners.RequestListener
+            </listener-class>
+        </listener>
 
-    <listener>
-        <listener-class>
-            com.revenera.gcs.listeners.ContextAttributeListener
-        </listener-class>
-    </listener>
-    -->
+        <listener>
+            <listener-class>
+                com.revenera.gcs.listeners.ContextAttributeListener
+            </listener-class>
+        </listener>
+        -->
 
     <servlet>
         <servlet-name>genServices</servlet-name>

@@ -5,7 +5,7 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import java.util.List;
 
 public interface ImplementorManagement {
-  void addImplementor(final GeneratorBase imp, final boolean isDefault);
+  void addImplementor(final TechnologyProperties imp, final boolean isDefault);
 
   LicenseGeneratorServiceInterface getDefaultImplementor();
 

@@ -6,23 +6,25 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
+import org.apache.commons.lang3.NotImplementedException;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.function.Function;
 
 @SuppressWarnings("unused")
 @GeneratorImplementor(technologyId = "NONE", technologyName = "No Enforcement License Technology", isDefault = false)
-public class NO_LicenseGenerator extends GeneratorBase {
+public class NO_LicenseGenerator extends GeneratorBase implements LicenseGeneratorServiceInterface {
+
+  @Override
+  public LicenseGeneratorServiceInterface generator() {
+    return this;
+  }
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    return super.ping(request);
+    AppContext.injectRequest(this, request);
+
+    return AppContext.injectResponse(this, PingResponse.class, super.doPing());
   }
-
-
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
@@ -59,42 +61,32 @@ public class NO_LicenseGenerator extends GeneratorBase {
   }
 
   @Override
-  public Status validateProduct(ProductRequest request) throws LicGeneratorException {
+  public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
     AppContext.injectRequest(this, request);
-    return AppContext.injectResponse(this, Status.class, new Status() {
-      {
-        this.code = 0;
-        this.message = "OK";
-      }
-    });
+    return super.doValidateProduct(request);
   }
 
   @Override
-  public Status validateLicenseModel(LicenseModelRequest request) throws LicGeneratorException {
+  public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
     AppContext.injectRequest(this, request);
-    return AppContext.injectResponse(this, Status.class, new Status() {
-      {
-        this.code = 0;
-        this.message = "OK";
-      }
-    });
+    return super.doValidateLicenseModel(request);
   }
 
   @Override
-  public LicenseFileDefinitionMap generateLicenseFilenames(GeneratorRequest request) throws LicGeneratorException {
+  public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
     AppContext.injectRequest(this, request);
-    return AppContext.injectResponse(this, LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap());
+    throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
-  public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(ConsolidatedLicenseResquest request) throws LicGeneratorException {
+  public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
     AppContext.injectRequest(this, request);
-    return AppContext.injectResponse(this, LicenseFileDefinitionMap.class, new LicenseFileDefinitionMap());
+    throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
-  public String generateCustomHostIdentifier(HostIdRequest request) throws LicGeneratorException {
+  public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
     AppContext.injectRequest(this, request);
-    return AppContext.injectResponse(this, String.class, "");
+    throw new NotImplementedException("generateCustomHostIdentifier");
   }
 }

@@ -9,20 +9,20 @@ import java.util.stream.Collectors;
 public class ImplementorFactory implements ImplementorManagement {
   private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
 
-  private final Map<String, LicenseGeneratorServiceInterface> implementors = new HashMap<>();
+  private final List<TechnologyProperties> implementors = new ArrayList<>();
 
-  private LicenseGeneratorServiceInterface defaultImplementor = null;
+  private TechnologyProperties defaultImplementor = null;
 
   public ImplementorFactory() {
     logger.me(this);
   }
 
   @Override
-  public void addImplementor(final GeneratorBase imp, final boolean isDefault) {
+  public void addImplementor(final TechnologyProperties imp, final boolean isDefault) {
 
     logger.debug().log("adding implementor", imp.technologyId(), imp.getClass().getSimpleName());
 
-    this.implementors.put(imp.technologyId(), imp);
+    this.implementors.add(imp);
 
     if (isDefault) {
       this.defaultImplementor = imp;
@@ -31,16 +31,19 @@ public class ImplementorFactory implements ImplementorManagement {
 
   @Override
   public LicenseGeneratorServiceInterface getDefaultImplementor() {
-    return this.defaultImplementor;
+    return this.defaultImplementor.generator();
   }
 
   @Override
   public LicenseGeneratorServiceInterface getImplementor(final String id) {
 
-    if (this.implementors.containsKey(id)) {
-      final LicenseGeneratorServiceInterface impl = this.implementors.get(id);
+    final TechnologyProperties implementor = this.implementors.stream()
+        .filter(t -> t.technologyId().equals(id))
+        .findFirst()
+        .orElse(null);
 
-      return this.implementors.get(id);
+    if (!Objects.isNull(implementor)) {
+      return implementor.generator();
     }
     else {
       return getDefaultImplementor();
@@ -49,6 +52,8 @@ public class ImplementorFactory implements ImplementorManagement {
 
   @Override
   public List<String> getImplementors() {
-    return new ArrayList<>(this.implementors.keySet());
+    return this.implementors.stream()
+        .map(TechnologyProperties::technologyId)
+        .collect(Collectors.toList());
   }
 }

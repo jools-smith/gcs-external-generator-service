@@ -2,11 +2,13 @@ package com.revenera.gcs.implementor.hbk;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
+import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.utils.Serializer;
+import org.apache.commons.lang3.NotImplementedException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @GeneratorImplementor(technologyId = "HBK", technologyName = "HBK/LMX License Technology", isDefault = false)
-public class HBK_LicenseGenerator extends GeneratorBase {
+public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGeneratorServiceInterface {
 
   final Function<XMLGregorianCalendar, String> parse_expiration_date = date ->
       date == null ? "perpetual" : date.toXMLFormat();
@@ -33,8 +35,15 @@ public class HBK_LicenseGenerator extends GeneratorBase {
       date == null ? Instant.now().toString() : date.toXMLFormat();
 
   @Override
+  public LicenseGeneratorServiceInterface generator() {
+    return this;
+  }
+
+  @Override
   public PingResponse ping(final PingRequest request) {
-    return super.ping(request);
+    AppContext.injectRequest(this, request);
+
+    return AppContext.injectResponse(this, PingResponse.class, super.doPing());
   }
 
   @Override
@@ -177,26 +186,33 @@ public class HBK_LicenseGenerator extends GeneratorBase {
 
   @Override
   public Status validateProduct(final ProductRequest request) throws LicGeneratorException {
-    return super.validateProduct(request);
+    AppContext.injectRequest(this, request);
+    return super.doValidateProduct(request);
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
-    return super.validateLicenseModel(request);
+    AppContext.injectRequest(this, request);
+    return super.doValidateLicenseModel(request);
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) throws LicGeneratorException {
-    return super.generateLicenseFilenames(request);
+    AppContext.injectRequest(this, request);
+    throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) throws LicGeneratorException {
-    return super.generateConsolidatedLicenseFilenames(request);
+    AppContext.injectRequest(this, request);
+    throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) throws LicGeneratorException {
-    return super.generateCustomHostIdentifier(request);
+    AppContext.injectRequest(this, request);
+    throw new NotImplementedException("generateCustomHostIdentifier");
   }
+
+
 }

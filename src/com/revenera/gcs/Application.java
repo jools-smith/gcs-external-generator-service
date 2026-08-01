@@ -3,6 +3,7 @@ package com.revenera.gcs;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
+import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionRecord;
@@ -153,9 +154,9 @@ public class Application implements ServletContextListener {
                 annotation.isDefault(),
                 type.getSimpleName());
 
-            if (GeneratorBase.class.isAssignableFrom(type)) {
+            if (TechnologyProperties.class.isAssignableFrom(type)) {
 
-              final GeneratorBase imp = (GeneratorBase) type.newInstance();
+              final TechnologyProperties imp = (TechnologyProperties) type.newInstance();
 
               imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 

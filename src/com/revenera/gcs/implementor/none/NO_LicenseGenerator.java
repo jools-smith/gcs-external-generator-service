@@ -36,6 +36,8 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
       {
         this.licenseFileName = "License";
         this.licenseText = "No license available";
+
+        this.licenseFiles = NO_LicenseGenerator.super.makeLicenseFiles(request.getLicenseFileDefinitions(), "No license available", null);
       }
     });
   }

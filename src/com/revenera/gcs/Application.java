@@ -148,7 +148,7 @@ public class Application implements ServletContextListener {
 
             final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-            logger.info().log("found implementor",
+            logger.info().log("found",
                 annotation.technologyId(),
                 annotation.technologyName(),
                 annotation.isDefault(),

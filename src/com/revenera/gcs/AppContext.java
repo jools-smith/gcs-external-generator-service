@@ -1,7 +1,6 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorManagement;
-import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 
 public class AppContext implements AutoCloseable {
-  private static final LoggingFactory logger = LoggingFactory.create(AppContext.class);
+//  private static final LoggingFactory logger = LoggingFactory.create(AppContext.class);
 
   static class DataObject {
     public final Frame frame;
@@ -62,10 +61,6 @@ public class AppContext implements AutoCloseable {
     context.set(new Transaction(new Frame(depth)));
   }
 
-  public AppContext() {
-    logger.me(this);
-  }
-
   @Override
   public void close() {
     final Transaction transaction = context.get();
@@ -84,7 +79,7 @@ public class AppContext implements AutoCloseable {
     // clear down thread data
     context.remove();
 
-    logger.debug().log("closed");
+//    logger.debug().log("closed");
   }
 
   public static void injectRequest(final Object self, final Object data) {

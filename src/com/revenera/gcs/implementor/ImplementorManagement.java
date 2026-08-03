@@ -11,5 +11,6 @@ public interface ImplementorManagement {
 
   LicenseGeneratorServiceInterface getImplementor(final String id);
 
+  @SuppressWarnings("unused")
   List<String> getImplementors();
 }

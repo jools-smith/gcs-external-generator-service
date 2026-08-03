@@ -5,42 +5,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.LoggingFactory;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 @JsonPropertyOrder({
     "className",
     "methodName",
     "lineNumber"
 })
 public class Frame {
-  public static final short ONE = 1;
-  public static final short TWO = 2;
-  public static final short THREE = 3;
-  public static final short FOUR = 4;
-  public static final short FIVE = 5;
+  public enum Depth {
+    ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7),;
 
-
+    final short depth;
+    Depth(final int value) {
+      this.depth = (short) value;
+    }
+  }
   private static final LoggingFactory logger = LoggingFactory.create(Frame.class);
 
   private final StackTraceElement frame;
 
-  public Frame(final short depth) {
-    this.frame = Thread.currentThread().getStackTrace()[depth];
+  public Frame(final Depth depth) {
+    this.frame = Thread.currentThread().getStackTrace()[depth.depth];
   }
 
   public Frame(final Class<?> type) {
     this.frame = getFrame(type.getCanonicalName());
   }
 
-  private static StackTraceElement getFrame(final String fqcn) {
+  private static StackTraceElement getFrame(final String FQDN) {
 
     for (final StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
-      if (stackTraceElement.getClassName().equals(fqcn)) {
+      if (stackTraceElement.getClassName().equals(FQDN)) {
         return stackTraceElement;
       }
     }
-    throw new IllegalArgumentException("No frame found for " + fqcn);
+    throw new IllegalArgumentException("No frame found for " + FQDN);
   }
 
   @JsonIgnore
@@ -58,6 +56,7 @@ public class Frame {
     return frame.getFileName();
   }
 
+  @SuppressWarnings("unused")
   public int getLineNumber() {
     return frame.getLineNumber();
   }

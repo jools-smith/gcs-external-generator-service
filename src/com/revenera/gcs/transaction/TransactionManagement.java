@@ -3,7 +3,6 @@ package com.revenera.gcs.transaction;
 import com.revenera.gcs.utils.Frame;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 public interface TransactionManagement {

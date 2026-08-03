@@ -3,7 +3,6 @@ package com.revenera.gcs;
 import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
-import com.revenera.gcs.utils.Frame;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.nio.file.Path;

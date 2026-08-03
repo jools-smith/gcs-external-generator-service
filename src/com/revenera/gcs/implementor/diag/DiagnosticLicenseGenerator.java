@@ -1,17 +1,13 @@
 package com.revenera.gcs.implementor.diag;
 
 import com.flexnet.external.type.*;
-import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
-import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.time.Instant;
-import java.util.ArrayList;
-
+@SuppressWarnings("unused")
 @GeneratorImplementor(technologyId = "DEF", technologyName = "Unimplemented License Technology", isDefault = true)
 public final class DiagnosticLicenseGenerator extends GeneratorBase implements LicenseGeneratorServiceInterface  {
 
@@ -35,14 +31,14 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase implements L
   }
 
   @Override
-  public Status validateLicenseModel(final LicenseModelRequest request) throws LicGeneratorException {
+  public Status validateLicenseModel(final LicenseModelRequest request) {
     AppContext.injectRequest(this, request);
 
     return AppContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
   }
 
   @Override
-  public GeneratorResponse generateLicense(GeneratorRequest request) throws LicGeneratorException {
+  public GeneratorResponse generateLicense(GeneratorRequest request) {
     AppContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateLicense");

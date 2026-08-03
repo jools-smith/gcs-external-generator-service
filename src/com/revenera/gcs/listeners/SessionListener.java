@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+@SuppressWarnings("unused")
 @WebListener
 public class SessionListener implements HttpSessionListener {
   private static final LoggingFactory logger = LoggingFactory.create(SessionListener.class);

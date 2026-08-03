@@ -60,14 +60,16 @@ public class ExecutionRecord {
     return this.duration.toNanos() / 1_000_000_000.0;
   }
 
+  @SuppressWarnings("unused")
   public long getCount() {
     return this.count;
   }
-
+  @SuppressWarnings("unused")
   public double getMeanLatency() {
     return getTotalDuration() / this.count;
   }
 
+  @SuppressWarnings("unused")
   public String getTimeSinceUpdate() {
     return Duration.between(this.updated, Instant.now()).toString();
   }

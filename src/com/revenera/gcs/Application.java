@@ -1,7 +1,6 @@
 package com.revenera.gcs;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
-import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
@@ -30,8 +29,8 @@ public class Application implements ServletContextListener {
   private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
   static {
-
-    try (final AppContext ctx = new AppContext(Frame.TWO)) {
+    //noinspection unused
+    try (final AppContext ctx = new AppContext(Frame.Depth.TWO)) {
       final Level level = Level.valueOf(
           AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
@@ -48,6 +47,7 @@ public class Application implements ServletContextListener {
 
   public Application() {
     logger.me(this);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
       logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
     }
@@ -75,6 +75,7 @@ public class Application implements ServletContextListener {
   }
 
   private void polling() {
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       while (AppContext.getTransactionManager().hasTransactions()) {
@@ -94,6 +95,7 @@ public class Application implements ServletContextListener {
   }
 
   private void logging() {
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       final List<String> messages = new ArrayList<>();
@@ -114,6 +116,7 @@ public class Application implements ServletContextListener {
   }
 
   private void housekeeping() {
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
       //TODO:what is this supposed to do?
       logger.yaml(Level.DEBUG,
@@ -132,7 +135,7 @@ public class Application implements ServletContextListener {
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
-
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 

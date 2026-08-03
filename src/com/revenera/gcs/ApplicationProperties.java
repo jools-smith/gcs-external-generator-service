@@ -68,6 +68,7 @@ public final class ApplicationProperties {
     return this.properties.get(Items.TIME).toString();
   }
 
+  @SuppressWarnings("unused")
   public String getTimestamp() {
     return this.properties.get(Items.TIMESTAMP).toString();
   }
@@ -80,6 +81,7 @@ public final class ApplicationProperties {
     return this.properties.get(Items.LOGGING_THRESHOLD).toString();
   }
 
+  @SuppressWarnings("unused")
   public boolean getLoggingEcho() {
     return Arrays.asList("true","on")
         .contains(this.properties.get(Items.LOGGING_ECHO).toString().toLowerCase());

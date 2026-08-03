@@ -72,6 +72,7 @@ public class AnnotationManager implements AutoCloseable {
     return files.stream().map(this::fileToPackageName).collect(Collectors.toList());
   }
 
+  @SuppressWarnings("unused")
   public List<String> findClassFilesInPackage(final Class<?> type) throws IOException, URISyntaxException {
 
     final String packageName = type.getPackage().getName();

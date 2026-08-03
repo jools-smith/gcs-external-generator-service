@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 
+@SuppressWarnings("unused")
 @WebFilter(urlPatterns = "/services/*")
 public class ApplicationRequestFilter implements Filter {
   private static final LoggingFactory logger = LoggingFactory.create(ApplicationRequestFilter.class);
@@ -18,7 +19,7 @@ public class ApplicationRequestFilter implements Filter {
   }
 
   @Override
-  public void init(final FilterConfig config) throws ServletException {
+  public void init(final FilterConfig config) {
     logger.debug().log(config.getFilterName(), config.getServletContext().getMajorVersion(), config.getServletContext().getMinorVersion());
 
     final Enumeration<String> itt = config.getInitParameterNames();

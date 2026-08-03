@@ -15,8 +15,8 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    //noinspection unused
+    try (final AppContext ignored = Beans.makeContext(this)) {
       // invoke implementor
       return AppContext
           .getImplementorFactory()
@@ -30,7 +30,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public Status validateProduct(final ProductRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
       // invoke implementor
       return AppContext
@@ -45,7 +45,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       return AppContext
@@ -60,7 +60,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       return AppContext
@@ -76,7 +76,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       return AppContext
@@ -91,7 +91,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       return AppContext
@@ -108,7 +108,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest payload)
       throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
 
       return AppContext
@@ -123,7 +123,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest payload) throws LicGeneratorException {
-//    logger.in(payload);
+    //noinspection unused
     try (final AppContext ctx = Beans.makeContext(this)) {
       return AppContext
           .getImplementorFactory()

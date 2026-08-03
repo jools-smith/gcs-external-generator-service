@@ -26,6 +26,7 @@ public class GeneratorResources {
     return Beans.getResourcePath("executable");
   }
 
+  @SuppressWarnings("unused")
   public Path getExecutablePath() {
     return Beans.getResourcePath("executable", "Test.exe");
   }
@@ -34,6 +35,7 @@ public class GeneratorResources {
     return Beans.getResourcePath("executable", executable);
   }
 
+  @SuppressWarnings("unused")
   public Path makeActualLicensePath(final String extension) {
 
     final String filename = String.format("%s.%08X.%s", technology, Instant.now().toEpochMilli(), extension);

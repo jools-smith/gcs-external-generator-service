@@ -21,7 +21,7 @@ public class LoggingFactory {
       .ofPattern("dd-MMM-yyyy HH:mm:ss.SSS", Locale.ENGLISH)
       .withZone(ZoneId.systemDefault());
 
-
+  @SuppressWarnings("unused")
   static final DateTimeFormatter zulu_formatter =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
           .withZone(ZoneId.systemDefault());
@@ -43,6 +43,7 @@ public class LoggingFactory {
       this.frame = new Frame(LoggingFactory.this.type);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private String makeLogMessage(final DateTimeFormatter timeFormatter, final String message) {
 
       final Appendable appendable = new StringBuilder();
@@ -72,8 +73,7 @@ public class LoggingFactory {
       synchronized (LoggingFactory.lock) {
 
         final String content = makeLogMessage(tomcat_formatter, message);
-
-        // rely on stdout redirection in Tomcat...
+        
         System.out.println(content);
 
         if (LoggingFactory.willLog(level)) {
@@ -118,6 +118,7 @@ public class LoggingFactory {
     loggingLevel.getAndSet(level);
   }
 
+  @SuppressWarnings("unused")
   public static Level getLoggingLevel() {
     return loggingLevel.get();
   }
@@ -140,6 +141,7 @@ public class LoggingFactory {
     return new InnerLogging(Level.ERROR);
   }
 
+  @SuppressWarnings("unused")
   public ILogging warning() {
     return new InnerLogging(Level.WARNING);
   }
@@ -152,10 +154,12 @@ public class LoggingFactory {
     return new InnerLogging(Level.DEBUG);
   }
 
+  @SuppressWarnings("unused")
   public ILogging verbose() {
     return new InnerLogging(Level.TRACE);
   }
 
+  @SuppressWarnings("unused")
   public ILogging trace() {
     return new InnerLogging(Level.TRACE);
   }
@@ -172,6 +176,7 @@ public class LoggingFactory {
     new InnerLogging(Level.TRACE).log("<--");
   }
 
+  @SuppressWarnings("unused")
   public void json(final Level level, final Object obj) {
     new InnerLogging(level)
         .log(obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));

@@ -4,6 +4,7 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 
 public interface TechnologyProperties {
 
+  @SuppressWarnings("unused")
   String technologyName();
 
   String technologyId();

@@ -58,8 +58,12 @@ public class AppContext implements AutoCloseable {
     context.set(new Transaction(new Frame(self.getClass())));
   }
 
-  AppContext(final short depth) {
+  AppContext(final Frame.Depth depth) {
     context.set(new Transaction(new Frame(depth)));
+  }
+
+  public AppContext() {
+    logger.me(this);
   }
 
   @Override
@@ -79,6 +83,8 @@ public class AppContext implements AutoCloseable {
 
     // clear down thread data
     context.remove();
+
+    logger.debug().log("closed");
   }
 
   public static void injectRequest(final Object self, final Object data) {

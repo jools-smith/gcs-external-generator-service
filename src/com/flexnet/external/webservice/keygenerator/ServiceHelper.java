@@ -27,48 +27,70 @@ public class ServiceHelper {
     final AtomicReference<LicenseTechnology> tech = new AtomicReference<>();
 
     if (obj instanceof ProductRequest) {
-      tech.set(((ProductRequest) obj).getLicenseTechnology());
+      final ProductRequest data = (ProductRequest) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof LicenseModelRequest) {
-      tech.set(((LicenseModelRequest) obj).getLicenseTechnology());
+      final LicenseModelRequest data = (LicenseModelRequest) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof GeneratorRequest) {
-      tech.set(((GeneratorRequest) obj).getLicenseTechnology());
+      final GeneratorRequest data = (GeneratorRequest) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof ConsolidatedLicenseResquest) {
-      ((ConsolidatedLicenseResquest) obj).getFulfillments().stream().findFirst().ifPresent(x -> {
+      final ConsolidatedLicenseResquest data = (ConsolidatedLicenseResquest) obj;
+      //noinspection CodeBlock2Expr
+      data.getFulfillments().stream().findFirst().ifPresent(x -> {
         tech.set(x.getLicenseTechnology());
       });
     }
     else if (obj instanceof FulfillmentRecordSet) {
-      ((FulfillmentRecordSet) obj).getFulfillments().stream().findFirst().ifPresent(x -> {
+      final FulfillmentRecordSet data = (FulfillmentRecordSet) obj;
+      //noinspection CodeBlock2Expr
+      data.getFulfillments().stream().findFirst().ifPresent(x -> {
         tech.set(x.getLicenseTechnology());
       });
     }
     else if (obj instanceof RenewableEntitlementLineItems) {
-      ((RenewableEntitlementLineItems) obj).getRenewableEntitlementLineItems().stream().findFirst().ifPresent(x -> {
+      final RenewableEntitlementLineItems data = (RenewableEntitlementLineItems) obj;
+      //noinspection CodeBlock2Expr
+      data.getRenewableEntitlementLineItems().stream().findFirst().ifPresent(x -> {
         tech.set(x.getLicenseTechnology());
       });
     }
     else if (obj instanceof EntitlementLineItem) {
-      tech.set(((EntitlementLineItem) obj).getLicenseTechnology());
+      final EntitlementLineItem data = (EntitlementLineItem) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof FulfillmentRecord) {
-      tech.set(((FulfillmentRecord) obj).getLicenseTechnology());
+      final FulfillmentRecord data = (FulfillmentRecord) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof ConsolidatedLicenseRecord) {
-      tech.set(((ConsolidatedLicenseRecord) obj).getLicenseTechnology());
+      final ConsolidatedLicenseRecord data = (ConsolidatedLicenseRecord) obj;
+
+      tech.set(data.getLicenseTechnology());
     }
     else if (obj instanceof PingRequest) {
+      final PingRequest data = (PingRequest) obj;
       //todo: KLUDGE
-      return ((PingRequest) obj).getStr();
+      tech.set(new LicenseTechnology() {
+        {
+          this.setName(data.getStr());
+        }
+      });
     }
 
     if (tech.get() == null) {
       throw new RuntimeException(obj.getClass().getName() + " | cannot retrieve license technology");
     }
     else {
-//      this.logger.log(Log.Level.info, "license tech:" + tech.get().getName());
       return tech.get().getName();
     }
   }

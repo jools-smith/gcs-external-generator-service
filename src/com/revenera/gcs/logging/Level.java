@@ -20,6 +20,8 @@ public enum Level {
   public int getValue() {
     return value;
   }
+
+  @SuppressWarnings("unused")
   public String getText() {
     return text;
   }

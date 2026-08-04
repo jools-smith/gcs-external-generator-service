@@ -47,24 +47,28 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase implements L
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("consolidateFulfillments");
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateCustomHostIdentifier");
   }
 }

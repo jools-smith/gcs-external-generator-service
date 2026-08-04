@@ -1,6 +1,8 @@
 package com.revenera.gcs.implementor;
 
 import com.flexnet.external.type.*;
+import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
+import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
@@ -37,7 +39,6 @@ public abstract class GeneratorBase extends Technology {
 
   protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
 
-  @SuppressWarnings("SameParameterValue")
   protected List<LicenseFileMapItem> makeLicenseFiles(final List<LicenseFileDefinition> files, final String text, final byte[] bytes) {
     return new ArrayList<LicenseFileMapItem>() {
       {

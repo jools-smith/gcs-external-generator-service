@@ -64,30 +64,35 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
   @Override
   public Status validateProduct(final ProductRequest request) {
     AppContext.injectRequest(this, request);
-    return super.doValidateProduct(request);
+
+    return AppContext.injectResponse(this, Status.class, super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
     AppContext.injectRequest(this, request);
-    return super.doValidateLicenseModel(request);
+
+    return AppContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
     AppContext.injectRequest(this, request);
+
     throw new NotImplementedException("generateCustomHostIdentifier");
   }
 }

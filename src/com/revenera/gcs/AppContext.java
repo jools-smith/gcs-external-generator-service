@@ -14,9 +14,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 public class AppContext implements AutoCloseable {
-//  private static final LoggingFactory logger = LoggingFactory.create(AppContext.class);
 
   static class DataObject {
     public final Frame frame;
@@ -98,7 +96,9 @@ public class AppContext implements AutoCloseable {
 
   public static <T> T injectResponse(final Object self, final Class<T> type, final T data) {
 
-    final Class<?> clazz = type.equals(data.getClass().getSuperclass()) ? type : data.getClass();
+    final Class<?> dataClass = data.getClass();
+
+    final Class<?> clazz = type.isAssignableFrom(dataClass) ? type : dataClass;
 
     context.get().response = new DataObject(new Frame(self.getClass()), data, clazz);
 

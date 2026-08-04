@@ -34,14 +34,14 @@ public class ApplicationRequestFilter implements Filter {
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws ServletException, IOException {
 
     final HttpServletRequest req = (HttpServletRequest) request;
+
+    final HttpServletResponse resp = (HttpServletResponse) response;
+
     logger.info().log("request",
         req.getMethod(),
         req.getRequestURI(),
-        req.getRemoteAddr(),
-        req.getContentType());
-
-    final HttpServletResponse resp = (HttpServletResponse) response;
-    logger.info().log("response",
+        req.getContentType(),
+        req.getQueryString(),
         resp.getStatus());
 
     chain.doFilter(request, response);

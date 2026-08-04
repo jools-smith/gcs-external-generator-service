@@ -34,19 +34,15 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
         req.getServletPath());
 
     logger.debug().log(event.getName(), event.getValue());
-
-
   }
 
   @Override
   public void attributeRemoved(ServletRequestAttributeEvent event) {
-    logger.in();
     logger.debug().log(event.getName(), event.getValue());
   }
 
   @Override
   public void attributeReplaced(ServletRequestAttributeEvent event) {
-    logger.in();
     logger.debug().log(event.getName(), event.getValue());
   }
 }

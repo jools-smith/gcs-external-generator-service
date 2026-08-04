@@ -1,8 +1,6 @@
 package com.revenera.gcs.implementor;
 
 import com.flexnet.external.type.*;
-import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
-import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.AppContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;

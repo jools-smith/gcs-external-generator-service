@@ -51,12 +51,12 @@ public class AppContext implements AutoCloseable {
 
   static final ThreadLocal<Transaction> context = new ThreadLocal<>();
 
-  AppContext(final Object self) {
-    context.set(new Transaction(new Frame(self.getClass())));
-  }
+//  AppContext(final Object self) {
+//    context.set(new Transaction(new Frame(self.getClass())));
+//  }
 
-  AppContext(final Frame.Depth depth) {
-    context.set(new Transaction(new Frame(depth)));
+  public AppContext() {
+    context.set(new Transaction(new Frame(Frame.Depth.TWO)));
   }
 
   @Override

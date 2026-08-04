@@ -30,7 +30,7 @@ public class Application implements ServletContextListener {
 
   static {
     //noinspection unused
-    try (final AppContext ctx = new AppContext(Frame.Depth.TWO)) {
+    try (final AppContext ctx =new AppContext()) {
       final Level level = Level.valueOf(
           AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
@@ -48,7 +48,7 @@ public class Application implements ServletContextListener {
   public Application() {
     logger.me(this);
     //noinspection unused
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    try (final AppContext ctx = new AppContext()) {
       logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
@@ -76,7 +76,7 @@ public class Application implements ServletContextListener {
 
   private void polling() {
     //noinspection unused
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    try (final AppContext ctx = new AppContext()) {
 
       while (AppContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
@@ -96,7 +96,7 @@ public class Application implements ServletContextListener {
 
   private void logging() {
     //noinspection unused
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    try (final AppContext ctx = new AppContext()) {
 
       final List<String> messages = new ArrayList<>();
       while (LoggingFactory.hasMessages()) {
@@ -117,7 +117,7 @@ public class Application implements ServletContextListener {
 
   private void housekeeping() {
     //noinspection unused
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    try (final AppContext ctx = new AppContext()) {
       //TODO:what is this supposed to do?
       logger.yaml(Level.DEBUG,
           AppContext.getExecutionManager().getRecords().stream()
@@ -136,7 +136,7 @@ public class Application implements ServletContextListener {
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
     //noinspection unused
-    try (final AppContext ctx = Beans.makeContext(this)) {
+    try (final AppContext ctx = new AppContext()) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
       try (final AnnotationManager manager = new AnnotationManager()) {

@@ -39,7 +39,7 @@ public class Beans {
     return getResourcePath("logs");
   }
 
-  public static AppContext makeContext(final Object self) {
-    return new AppContext(self);
-  }
+//  public static AppContext makeContext(final Object self) {
+//    return new AppContext(self);
+//  }
 }

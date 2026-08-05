@@ -47,10 +47,12 @@ public class Serializer {
     return serialize(yaml_mapper, payload);
   }
 
+  @SuppressWarnings("unused")
   public static String jsonToBase64(final Object payload) {
     return Base64.getEncoder().encodeToString(safeSerializeJsonIndented(payload).getBytes());
   }
 
+  @SuppressWarnings("unused")
   public static String yamlToBase64(final Object payload) {
     return Base64.getEncoder().encodeToString(safeSerializeYaml(payload).getBytes());
   }

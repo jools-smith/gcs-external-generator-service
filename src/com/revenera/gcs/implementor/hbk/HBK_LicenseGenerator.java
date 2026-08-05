@@ -42,7 +42,7 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
   public PingResponse ping(final PingRequest request) {
     ExecutionContext.injectRequest(request);
 
-    return (PingResponse)ExecutionContext.injectResponse(super.doPing());
+    return ExecutionContext.injectResponse(super.doPing());
   }
 
   @Override

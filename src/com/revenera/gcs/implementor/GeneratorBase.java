@@ -37,6 +37,7 @@ public abstract class GeneratorBase extends Technology {
 
   protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
 
+  @SuppressWarnings("SameParameterValue")
   protected List<LicenseFileMapItem> makeLicenseFiles(final List<LicenseFileDefinition> files, final String text, final byte[] bytes) {
     return new ArrayList<LicenseFileMapItem>() {
       {

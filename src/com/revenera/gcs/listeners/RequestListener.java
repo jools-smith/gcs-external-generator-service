@@ -22,6 +22,7 @@ public class RequestListener implements ServletRequestListener {
    */
   @Override
   public void requestDestroyed(ServletRequestEvent event) {
+    //noinspection CodeBlock2Expr
     Optional.ofNullable((HttpServletRequest) event.getServletRequest()).ifPresent(req -> {
       logger.get().debug("destroyed",
           req.getMethod(),
@@ -32,6 +33,7 @@ public class RequestListener implements ServletRequestListener {
 
   @Override
   public void requestInitialized(ServletRequestEvent event) {
+    //noinspection CodeBlock2Expr
     Optional.ofNullable((HttpServletRequest) event.getServletRequest()).ifPresent(req -> {
       logger.get().debug("initialized",
           req.getMethod(),

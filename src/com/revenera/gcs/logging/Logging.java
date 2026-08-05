@@ -1,26 +1,27 @@
 package com.revenera.gcs.logging;
 
 public interface Logging {
+  @SuppressWarnings("unused")
   default void all(String message) {
     log(Level.ALL, "{0}", message);
   }
-
+  @SuppressWarnings("unused")
   default void error(String message) {
     log(Level.ERROR, "{0}", message);
   }
-
+  @SuppressWarnings("unused")
   default void warn(String message) {
     log(Level.WARN, "{0}", message);
   }
-
+  @SuppressWarnings("unused")
   default void info(String message) {
     log(Level.INFO, "{0}", message);
   }
-
+  @SuppressWarnings("unused")
   default void full(String message) {
     log(Level.FULL, "{0}", message);
   }
-
+  @SuppressWarnings("unused")
   default void trace(String message) {
     log(Level.TRACE, "{0}", message);
   }
@@ -32,7 +33,7 @@ public interface Logging {
   void exception(Throwable t);
 
   void log(Level level, String format, Object...params);
-
+  @SuppressWarnings("unused")
   default void all(String format, Object... params) {
     log(Level.ALL, format, params);
   }
@@ -48,11 +49,11 @@ public interface Logging {
   default void info(String format, Object... params) {
     log(Level.INFO, format, params);
   }
-
+  @SuppressWarnings("unused")
   default void full(String format, Object... params) {
     log(Level.FULL, format, params);
   }
-
+  @SuppressWarnings("unused")
   default void trace(String format, Object... params) {
     log(Level.TRACE, format, params);
   }

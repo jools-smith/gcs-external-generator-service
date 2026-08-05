@@ -24,6 +24,7 @@ public class Frame {
 
   private final StackTraceElement frame;
 
+  @SuppressWarnings("unused")
   public Frame() {
     this.frame = Thread.currentThread().getStackTrace()[2];
   }

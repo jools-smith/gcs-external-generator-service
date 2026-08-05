@@ -4,6 +4,7 @@ import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.ClassUtils;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class LoggingFactory {
+abstract class LoggingManager {
   static final DateTimeFormatter tomcat_formatter = DateTimeFormatter
       .ofPattern("dd-MMM-yyyy HH:mm:ss.SSS", Locale.ENGLISH)
       .withZone(ZoneId.systemDefault());
@@ -32,81 +33,7 @@ public class LoggingFactory {
 
   static final AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
 
-  // genuinely is an inner class, cannot be static
-  private class InnerLogging implements ILogging {
-    final Instant time = Instant.now();
-    final Level level;
-    final Frame frame;
-
-    InnerLogging(final Level level) {
-      this.level = level;
-      this.frame = new Frame(LoggingFactory.this.type);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private String makeLogMessage(final DateTimeFormatter timeFormatter, final String message) {
-
-      final Appendable appendable = new StringBuilder();
-
-      try (final Formatter formatter = new Formatter(appendable)) {
-
-        final String className = LoggingFactory.this.type.getCanonicalName().equals(this.frame.getClassName()) ?
-            LoggingFactory.this.type.getSimpleName() :
-            ClassUtils.getAbbreviatedName(this.frame.getClassName(), 32);
-
-        formatter.format("%s %5s [%s] %s %s (%d) %s",
-            timeFormatter.format(this.time),
-            this.level,
-            Thread.currentThread().getName(),
-            className,
-            this.frame.getMethodName(),
-            this.frame.getLineNumber(),
-            message);
-
-        formatter.flush();
-
-        return appendable.toString();
-      }
-    }
-
-    private void post(final String message) {
-      synchronized (LoggingFactory.lock) {
-
-        final String content = makeLogMessage(tomcat_formatter, message);
-        
-        System.out.println(content);
-
-        if (LoggingFactory.willLog(level)) {
-          LoggingFactory.messageQueue.add(content);
-        }
-      }
-    }
-
-    @Override
-    public void log(final String message) {
-      post(message);
-    }
-
-    @Override
-    public void log(final Object... params) {
-      post(Arrays
-          .stream(params)
-          .map(x -> x == null ? "null" : x.toString())
-          .collect(Collectors.joining(" | ")));
-    }
-
-    @Override
-    public void log(final Throwable t) {
-      final StackTraceElement frame = t.getStackTrace()[0];
-
-      log(t.getClass().getName(),
-          t.getLocalizedMessage(),
-          frame.getFileName(),
-          frame.getClassName(),
-          frame.getMethodName(),
-          frame.getLineNumber());
-    }
-  }
+  // Static Methods
 
   public static boolean willLog(final Level level) {
     return loggingLevel.get().compare(level) >= 0;
@@ -128,70 +55,115 @@ public class LoggingFactory {
   public static String pollMessageQueue() {
     return messageQueue.poll();
   }
+}
+
+public class LoggingFactory extends LoggingManager {
+
+  // genuinely is an inner class, cannot be static
+  private class Logger implements Logging {
+    final Instant time = Instant.now();
+    final Frame frame;
+
+    private Logger() {
+      this.frame = new Frame(LoggingFactory.this.type);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private String formatLogMessage(final Level level, final DateTimeFormatter timeFormatter, final String message) {
+
+      final Appendable appendable = new StringBuilder();
+
+      try (final Formatter formatter = new Formatter(appendable)) {
+
+        formatter.format("%s %5s [%s] %s %s (%d) %s",
+            timeFormatter.format(this.time),
+            level,
+            Thread.currentThread().getName(),
+            ClassUtils.getAbbreviatedName(this.frame.getClassName(), 64),
+            this.frame.getMethodName(),
+            this.frame.getLineNumber(),
+            message);
+
+        formatter.flush();
+
+        return appendable.toString();
+      }
+    }
+
+    private void post(final Level level, final String message) {
+      synchronized (lock) {
+        final String logMessage = formatLogMessage(level, tomcat_formatter, message);
+
+        System.out.println(logMessage);
+
+        if (willLog(level)) {
+          messageQueue.add(logMessage);
+        }
+      }
+    }
+
+    @Override
+    public void log(final Level level, final String format, final Object... params) {
+      try {
+        post(level, MessageFormat.format(format, params));
+      }
+      catch (final IllegalArgumentException e) {
+        post(level,format + "|" + Arrays.stream(params)
+            .map(Object::toString)
+            .collect(Collectors.joining("|")));
+      }
+    }
+
+    @Override
+    public void exception(final Throwable t) {
+      final StackTraceElement frame = t.getStackTrace()[0];
+
+      error("{0} | {1} | {2}.{3}({4})",
+          t.getClass().getName(),
+          t.getLocalizedMessage(),
+          frame.getClassName(),
+          frame.getMethodName(),
+          frame.getLineNumber());
+    }
+  }
+
 
   final Class<?> type;
 
-  LoggingFactory(Class<?> type) {
+  LoggingFactory(final Class<?> type) {
     this.type = type;
   }
 
-  public ILogging error() {
-    return new InnerLogging(Level.ERROR);
+  // TODO: Factory Methods not part of the interface
+  public Logging get() {
+    return new Logger();
   }
 
-  @SuppressWarnings("unused")
-  public ILogging warning() {
-    return new InnerLogging(Level.WARN);
-  }
-
-  public ILogging info() {
-    return new InnerLogging(Level.INFO);
-  }
-
-  public ILogging debug() {
-    return new InnerLogging(Level.DEBUG);
-  }
-
-  @SuppressWarnings("unused")
-  public ILogging verbose() {
-    return new InnerLogging(Level.TRACE);
-  }
-
-  @SuppressWarnings("unused")
-  public ILogging trace() {
-    return new InnerLogging(Level.TRACE);
-  }
-
-  public ILogging get(final Level level) {
-    return new InnerLogging(level);
-  }
-
+  //TRACE
   public void in() {
-    new InnerLogging(Level.TRACE).log("-->");
+    new Logger().log(Level.TRACE, "-->");
   }
-
+  //TRACE
   public void out() {
-    new InnerLogging(Level.TRACE).log("<--");
+    new Logger().log(Level.TRACE,"<--");
+  }
+  //TRACE
+  public void me(final Object obj) {
+    new Logger().log(Level.TRACE, String.format("%08X", obj.hashCode()));
   }
 
   @SuppressWarnings("unused")
   public void json(final Level level, final Object obj) {
-    new InnerLogging(level)
-        .log(obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
+    new Logger().log(level, "{0} | {1}", obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
-    new InnerLogging(level)
-        .log(obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
+    new Logger().log(level, "{0} | {1}", obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
-  public void me(final Object obj) {
-    new InnerLogging(Level.TRACE)
-        .log(String.format("%08X", obj.hashCode()));
-  }
-
+  //ERROR
   public void exception(final Throwable t) {
-    new InnerLogging(Level.ERROR).log(t);
+    new Logger().exception(t);
   }
 
   public Class<?> getType() {

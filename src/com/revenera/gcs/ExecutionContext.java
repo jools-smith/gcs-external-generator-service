@@ -1,8 +1,6 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorManagement;
-import com.revenera.gcs.logging.Logging;
-import com.revenera.gcs.logging.LoggingContextFactory;
 import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
@@ -10,6 +8,7 @@ import com.revenera.gcs.utils.Frame;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -49,38 +48,22 @@ class Transaction {
   }
 }
 
-//class Payload {
-//  final Frame frame;
-//  final String name;
-//  final Object data;
-//
-//  Payload(final Frame frame, final String name, final Object data) {
-//    this.frame = frame;
-//    this.name = name;
-//    this.data = data;
-//  }
-//
-//  public String getFrame() {
-//    return frame.getLocation();
-//  }
-//
-//  public Object getData() {
-//    return new AbstractMap.SimpleImmutableEntry<>(name, new Object[] {data.getClass().getSimpleName(),data});
-//  }
-//}
-
-
 public class ExecutionContext implements AutoCloseable {
 
-  static final ThreadLocal<Transaction> context = new ThreadLocal<>();
+  static final ThreadLocal<LinkedList<Transaction>> context = new ThreadLocal<>();
 
   public ExecutionContext() {
-    context.set(new Transaction(new Frame()));
+
+    if (context.get() == null) {
+      context.set(new LinkedList<>());
+    }
+
+    context.get().add(new Transaction(new Frame(Frame.Depth.ONE)));
   }
 
   @Override
   public void close() {
-    final Transaction transaction = context.get();
+    final Transaction transaction = context.get().removeLast();
 
     Beans.diagnosticsFactory.submitExecutionDetails(transaction.timestamp, transaction.frame);
 
@@ -93,31 +76,35 @@ public class ExecutionContext implements AutoCloseable {
           transaction.payload);
     }
 
-    // clear down thread data
-    context.remove();
+    if (context.get().isEmpty()) {
+      // clear down thread data
+      context.remove();
+    }
   }
 
-  public static void injectRequest(final Object self, final Object data) {
-    context.get().request = new DataObject(new Frame(self.getClass()), data);
+  @SuppressWarnings("UnusedReturnValue")
+  public static <T> T injectRequest(final T data) {
+    context.get().getLast().request = new DataObject(new Frame(Frame.Depth.ONE), data);
+
+    return data;
   }
 
-  public static void injectPayload(final Object self, final Object data) {
-    final Transaction ctx = context.get();
+  @SuppressWarnings("UnusedReturnValue")
+  public static <T> T injectPayload(final T data) {
+    final Transaction ctx = context.get().getLast();
 
     if (ctx.payload == null) {
       ctx.payload = new LinkedList<>();
     }
 
-    ctx.payload.add(new DataObject(new Frame(self.getClass()), data));
+    ctx.payload.add(new DataObject(new Frame(Frame.Depth.ONE), data));
+
+    return data;
   }
 
-  public static <T> T injectResponse(final Object self, final Class<T> type, final T data) {
+  public static <T> T injectResponse(final T data) {
 
-    final Class<?> dataClass = data.getClass();
-
-    final Class<?> clazz = type.isAssignableFrom(dataClass) ? type : dataClass;
-
-    context.get().response = new DataObject(new Frame(self.getClass()), data, clazz);
+    context.get().getLast().response = new DataObject(new Frame(Frame.Depth.ONE), data);
 
     return data;
   }
@@ -142,12 +129,8 @@ public class ExecutionContext implements AutoCloseable {
     return Beans.diagnosticsFactory;
   }
 
-  public static LoggingContextFactory getLoggingContextFactory() {
-    return Beans.loggingContextFactory;
-  }
-
-  public static Logging logger() {
-    return Beans.loggingContextFactory.logger(Frame.Depth.THREE);
+  public static Path getLogPath() {
+    return Beans.getLogPath();
   }
 
   public static Map<String, Object> getApplicationData() {

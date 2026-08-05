@@ -1,15 +1,64 @@
 package com.revenera.gcs.logging;
 
 public interface Logging {
-  void log(LogLevel level, String message, Object... params);
+  default void all(String message) {
+    log(Level.ALL, "{0}", message);
+  }
 
-  void error(String message, Object... params);
-  void warn(String message, Object... params);
-  void info(String message, Object... params);
-  void full(String message, Object... params);
-  void debug(String message, Object... params);
-  void trace(String message, Object... params);
+  default void error(String message) {
+    log(Level.ERROR, "{0}", message);
+  }
 
+  default void warn(String message) {
+    log(Level.WARN, "{0}", message);
+  }
+
+  default void info(String message) {
+    log(Level.INFO, "{0}", message);
+  }
+
+  default void full(String message) {
+    log(Level.FULL, "{0}", message);
+  }
+
+  default void trace(String message) {
+    log(Level.TRACE, "{0}", message);
+  }
+
+  default void debug(String message) {
+    log(Level.DEBUG, "{0}", message);
+  }
 
   void exception(Throwable t);
+
+  void log(Level level, String format, Object...params);
+
+  default void all(String format, Object... params) {
+    log(Level.ALL, format, params);
+  }
+
+  default void error(String format, Object... params) {
+    log(Level.ERROR, format, params);
+  }
+
+  default void warn(String format, Object... params) {
+    log(Level.WARN, format, params);
+  }
+
+  default void info(String format, Object... params) {
+    log(Level.INFO, format, params);
+  }
+
+  default void full(String format, Object... params) {
+    log(Level.FULL, format, params);
+  }
+
+  default void trace(String format, Object... params) {
+    log(Level.TRACE, format, params);
+  }
+
+  default void debug(String format, Object... params) {
+    log(Level.DEBUG, format, params);
+  }
 }
+

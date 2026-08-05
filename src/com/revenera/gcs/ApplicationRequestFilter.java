@@ -20,13 +20,13 @@ public class ApplicationRequestFilter implements Filter {
 
   @Override
   public void init(final FilterConfig config) {
-    logger.debug().log(config.getFilterName(), config.getServletContext().getMajorVersion(), config.getServletContext().getMinorVersion());
+    logger.get().debug(config.getFilterName(), config.getServletContext().getMajorVersion(), config.getServletContext().getMinorVersion());
 
     final Enumeration<String> itt = config.getInitParameterNames();
     while (itt.hasMoreElements()) {
       final String key = itt.nextElement();
 
-      logger.info().log(key, config.getInitParameter(key));
+      logger.get().info(key, config.getInitParameter(key));
     }
   }
 
@@ -37,7 +37,7 @@ public class ApplicationRequestFilter implements Filter {
 
     final HttpServletResponse resp = (HttpServletResponse) response;
 
-    logger.info().log("request",
+    logger.get().info("request",
         req.getMethod(),
         req.getRequestURI(),
         req.getContentType(),

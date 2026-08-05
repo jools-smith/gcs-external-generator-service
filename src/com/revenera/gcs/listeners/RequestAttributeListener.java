@@ -24,7 +24,7 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
     logger.in();
     HttpServletRequest req = (HttpServletRequest) event.getServletRequest();
 
-    logger.debug().log(
+    logger.get().debug(
         req.getMethod(),
         req.getRequestURI(),
         req.getQueryString(),
@@ -33,16 +33,16 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
         req.getContextPath(),
         req.getServletPath());
 
-    logger.debug().log(event.getName(), event.getValue());
+    logger.get().debug(event.getName(), event.getValue());
   }
 
   @Override
   public void attributeRemoved(ServletRequestAttributeEvent event) {
-    logger.debug().log(event.getName(), event.getValue());
+    logger.get().debug(event.getName(), event.getValue());
   }
 
   @Override
   public void attributeReplaced(ServletRequestAttributeEvent event) {
-    logger.debug().log(event.getName(), event.getValue());
+    logger.get().debug(event.getName(), event.getValue());
   }
 }

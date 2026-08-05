@@ -18,56 +18,56 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase implements L
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, PingResponse.class, super.doPing());
+    return ExecutionContext.injectResponse(super.doPing());
   }
 
   @Override
   public Status validateProduct(final ProductRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateProduct(request));
+    return ExecutionContext.injectResponse(super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
+    return ExecutionContext.injectResponse(super.doValidateLicenseModel(request));
   }
 
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateLicense");
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("consolidateFulfillments");
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }

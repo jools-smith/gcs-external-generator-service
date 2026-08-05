@@ -36,14 +36,14 @@ public class Housekeeper {
   }
 
   void start(final Object id, final Runnable command, final int delay, final int period, final TimeUnit units) {
-    logger.info().log("starting", id.toString(), delay, period, units);
+    logger.get().info("starting", id.toString(), delay, period, units);
 
     runners.put(id, this.scheduler.scheduleAtFixedRate(command, delay, period, units));
   }
 
   void cancel(final Object id) {
     try {
-      logger.info().log("cancelling", id.toString());
+      logger.get().info("cancelling", id.toString());
 
       runners.get(id).cancel(false);
     }
@@ -54,16 +54,16 @@ public class Housekeeper {
 
   void shutdown() {
     try {
-      logger.info().log("shutting down scheduler");
+      logger.get().info("shutting down scheduler");
 
       this.scheduler.shutdown();
 
       if (!this.scheduler.awaitTermination(30, TimeUnit.SECONDS)) {
-        logger.info().log("forcing scheduler shutdown");
+        logger.get().info("forcing scheduler shutdown");
         this.scheduler.shutdownNow();
       }
       else {
-        logger.info().log("scheduler shutdown completed normally");
+        logger.get().info("scheduler shutdown completed normally");
       }
     }
     catch (Throwable e) {

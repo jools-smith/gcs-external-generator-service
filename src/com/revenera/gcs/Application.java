@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -29,23 +30,17 @@ public class Application implements ServletContextListener {
 
   static {
     //noinspection unused
-    try (final ExecutionContext ctx =new ExecutionContext()) {
-      try {
-        final Level level = Level.valueOf(
-            ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-        LoggingFactory.setLoggingLevel(level);
+      final Level level = Level.valueOf(
+          ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
-        logger.info().log("set logging level to", level);
+      LoggingFactory.setLoggingLevel(level);
 
-        ExecutionContext.logger().full("{0} {1} {2}", "hello", "world", "...");
-      }
-      catch (final Throwable t) {
-        ExecutionContext.logger().exception(t);
-      }
-      finally {
-        ExecutionContext.logger().full("{0} {1} {2} {4}", "finally", "got", "here", "...");
-      }
+      logger.get().info("set logging level to {0}", level);
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
     }
   }
 
@@ -55,28 +50,24 @@ public class Application implements ServletContextListener {
     logger.me(this);
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      logger.info().log("version", ExecutionContext.getApplicationProperties().getVersionDetails());
+      logger.get().info("version", ExecutionContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
     }
   }
 
-  private void serializeToLogPath(final String filename, final List<String> content) {
-    try {
-      //TODO: log into log directory in web app
-      final String root = Beans.getLogPath().toRealPath().toString();
+  private void serializeToLogPath(final String filename, final List<String> content) throws IOException {
+    //noinspection unused
+    try (final ExecutionContext ctx = new ExecutionContext()) {
+      final String root = ExecutionContext.getLogPath().toRealPath().toString();
 
       if (Files.exists(Paths.get(root))) {
-
         FileUtils.writeLines(
             Paths.get(root, filename).toAbsolutePath().toFile().getAbsoluteFile(),
             content,
             true);
       }
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
     }
   }
 
@@ -157,7 +148,7 @@ public class Application implements ServletContextListener {
 
             final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-            logger.info().log("found",
+            logger.get().info("found",
                 annotation.technologyId(),
                 annotation.technologyName(),
                 annotation.isDefault(),
@@ -172,7 +163,7 @@ public class Application implements ServletContextListener {
               ExecutionContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
             }
             else {
-              logger.error().log("invalid implementor",
+              logger.get().warn("invalid implementor",
                   annotation.technologyId(),
                   annotation.technologyName(),
                   type.getSimpleName());
@@ -183,7 +174,7 @@ public class Application implements ServletContextListener {
 
       final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {
-        logger.info().log("default implementor", implementor.getClass().getName());
+        logger.get().info("default implementor", implementor.getClass().getName());
       }
       else {
         throw new RuntimeException("No default implementor found");
@@ -194,11 +185,12 @@ public class Application implements ServletContextListener {
       this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
       this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
       this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
-
-      logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
     }
     catch (final Throwable t) {
       logger.exception(t);
+    }
+    finally {
+      logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
     }
     logger.out();
   }

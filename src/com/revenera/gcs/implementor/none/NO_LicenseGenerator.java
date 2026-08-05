@@ -20,18 +20,18 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, PingResponse.class, super.doPing());
+    return ExecutionContext.injectResponse(super.doPing());
   }
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) {
     logger.in();
 
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, GeneratorResponse.class, new GeneratorResponse() {
+    return ExecutionContext.injectResponse(new GeneratorResponse() {
       {
         this.licenseFileName = "License";
         this.licenseText = "No license available";
@@ -45,9 +45,9 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
     logger.in();
 
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, ConsolidatedLicense.class, new ConsolidatedLicense() {
+    return ExecutionContext.injectResponse(new ConsolidatedLicense() {
       {
         this.fulfillments = request.getFulfillments();
 
@@ -63,35 +63,35 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
 
   @Override
   public Status validateProduct(final ProductRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateProduct(request));
+    return ExecutionContext.injectResponse(super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
+    return ExecutionContext.injectResponse(super.doValidateLicenseModel(request));
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }

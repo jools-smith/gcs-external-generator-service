@@ -40,30 +40,30 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, PingResponse.class, super.doPing());
+    return (PingResponse)ExecutionContext.injectResponse(super.doPing());
   }
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) {
     logger.in();
     try {
-      ExecutionContext.injectRequest(this, request);
+      ExecutionContext.injectRequest(request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
       final Path executablePath = res.getExecutablePath("hbk-signer.exe");
-      logger.debug().log("executable path", executablePath.toString());
+      logger.get().debug("executable path", executablePath.toString());
 
       final Path workingDirectory = res.getWorkingDirectory();
-      logger.debug().log("working directory", workingDirectory.toString());
+      logger.get().debug("working directory", workingDirectory.toString());
 
       final Path inputLicenseFilePath = res.getLicenseFilepath();
-      logger.debug().log("input license file", inputLicenseFilePath.toString());
+      logger.get().debug("input license file", inputLicenseFilePath.toString());
 
       final Path outputLicenseFilePath = Paths.get(inputLicenseFilePath.toAbsolutePath() + ".json");
-      logger.debug().log("output license file", outputLicenseFilePath.toString());
+      logger.get().debug("output license file", outputLicenseFilePath.toString());
 
       final Object payload = new LinkedHashMap<String,Object>() {
         {
@@ -100,10 +100,10 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
       };
 
       //TODO:debug
-      ExecutionContext.injectPayload(this, payload);
+      ExecutionContext.injectPayload(payload);
 
       final String json = Serializer.safeSerializeJson(payload);
-      logger.debug().log("payload", json);
+      logger.get().debug("payload", json);
 
       // TODO: create the license file template
       Files.write(inputLicenseFilePath.toAbsolutePath(), json.getBytes());
@@ -117,10 +117,10 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
 
       // TODO: invoke the file signer
       final Process proc = pb.start();
-      logger.debug().log("started process");
+      logger.get().debug("started process");
 
       final boolean status = proc.waitFor(30, TimeUnit.SECONDS);
-      logger.debug().log("finished process");
+      logger.get().debug("finished process");
 
       // TODO: ingest the license file and delete off disk once read
       try (final BufferedReader reader =
@@ -128,7 +128,7 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return ExecutionContext.injectResponse(this, GeneratorResponse.class, new GeneratorResponse() {
+        return ExecutionContext.injectResponse(new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -155,9 +155,9 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
     logger.in();
     try {
-      ExecutionContext.injectRequest(this, request);
+      ExecutionContext.injectRequest(request);
 
-      return ExecutionContext.injectResponse(this, ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return ExecutionContext.injectResponse(new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 
@@ -187,35 +187,35 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
 
   @Override
   public Status validateProduct(final ProductRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateProduct(request));
+    return ExecutionContext.injectResponse(super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
-    return ExecutionContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
+    return ExecutionContext.injectResponse(super.doValidateLicenseModel(request));
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
-    ExecutionContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(request);
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }

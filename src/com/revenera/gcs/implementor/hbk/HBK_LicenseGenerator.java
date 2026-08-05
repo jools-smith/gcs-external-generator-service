@@ -2,7 +2,7 @@ package com.revenera.gcs.implementor.hbk;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
-import com.revenera.gcs.AppContext;
+import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
@@ -40,16 +40,16 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, PingResponse.class, super.doPing());
+    return ExecutionContext.injectResponse(this, PingResponse.class, super.doPing());
   }
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) {
     logger.in();
     try {
-      AppContext.injectRequest(this, request);
+      ExecutionContext.injectRequest(this, request);
 
       final GeneratorResources res = new GeneratorResources(technologyId());
 
@@ -100,7 +100,7 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
       };
 
       //TODO:debug
-      AppContext.injectPayload(this, payload);
+      ExecutionContext.injectPayload(this, payload);
 
       final String json = Serializer.safeSerializeJson(payload);
       logger.debug().log("payload", json);
@@ -128,7 +128,7 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
                    new InputStreamReader(
                        Files.newInputStream(outputLicenseFilePath, StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)))) {
 
-        return AppContext.injectResponse(this, GeneratorResponse.class, new GeneratorResponse() {
+        return ExecutionContext.injectResponse(this, GeneratorResponse.class, new GeneratorResponse() {
           {
             this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
                 .stream()
@@ -155,9 +155,9 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
     logger.in();
     try {
-      AppContext.injectRequest(this, request);
+      ExecutionContext.injectRequest(this, request);
 
-      return AppContext.injectResponse(this, ConsolidatedLicense.class, new ConsolidatedLicense() {
+      return ExecutionContext.injectResponse(this, ConsolidatedLicense.class, new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
 
@@ -187,35 +187,35 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
 
   @Override
   public Status validateProduct(final ProductRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, Status.class, super.doValidateProduct(request));
+    return ExecutionContext.injectResponse(this, Status.class, super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
+    return ExecutionContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }

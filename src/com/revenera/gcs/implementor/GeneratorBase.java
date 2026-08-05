@@ -1,7 +1,7 @@
 package com.revenera.gcs.implementor;
 
 import com.flexnet.external.type.*;
-import com.revenera.gcs.AppContext;
+import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Serializer;
@@ -70,7 +70,7 @@ public abstract class GeneratorBase extends Technology {
   protected PingResponse doPing() {
     return new PingResponse() {
       {
-        this.info = Serializer.safeSerializeYaml(AppContext.getApplicationData());
+        this.info = Serializer.safeSerializeYaml(ExecutionContext.getApplicationData());
 
         class Bag {
           final Map<String, Object> elements = new LinkedHashMap<>();
@@ -96,9 +96,9 @@ public abstract class GeneratorBase extends Technology {
         this.str = new Bag()
             .with("technology", logger.getType().getSimpleName(), technologyId())
             .with("version",
-                AppContext.getApplicationProperties().getVersion(),
-                AppContext.getApplicationProperties().getDate(),
-                AppContext.getApplicationProperties().getTime())
+                ExecutionContext.getApplicationProperties().getVersion(),
+                ExecutionContext.getApplicationProperties().getDate(),
+                ExecutionContext.getApplicationProperties().getTime())
             .with("system",
                 SystemProperties.getOsName(),
                 SystemProperties.getOsVersion(),
@@ -108,7 +108,7 @@ public abstract class GeneratorBase extends Technology {
                 SystemUtils.getHostName(),
                 SystemProperties.getUserName("unknown"))
             .with("path", Beans.getResourcePath())
-            .with("up-time", AppContext.getApplicationDuration())
+            .with("up-time", ExecutionContext.getApplicationDuration())
             .build();
 
         this.processedTime = Instant.now().toString();

@@ -1,8 +1,7 @@
 package com.flexnet.external.webservice.keygenerator;
 
 import com.flexnet.external.type.*;
-import com.revenera.gcs.AppContext;
-import com.revenera.gcs.Beans;
+import com.revenera.gcs.ExecutionContext;
 
 import javax.jws.WebService;
 
@@ -16,9 +15,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ignored = new AppContext()) {
+    try (final ExecutionContext ignored = new ExecutionContext()) {
       // invoke implementor
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .ping(payload);
@@ -31,9 +30,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public Status validateProduct(final ProductRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
       // invoke implementor
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateProduct(payload);
@@ -46,9 +45,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public Status validateLicenseModel(final LicenseModelRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .validateLicenseModel(payload);
@@ -61,9 +60,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateLicense(payload);
@@ -77,9 +76,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .consolidateFulfillments(payload);
@@ -92,9 +91,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateLicenseFilenames(payload);
@@ -109,9 +108,9 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest payload)
       throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      return AppContext
+      return ExecutionContext
           .getImplementorFactory()
           .getImplementor(ServiceHelper.getLicenseTechnology(payload))
           .generateConsolidatedLicenseFilenames(payload);
@@ -124,8 +123,8 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest payload) throws LicGeneratorException {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
-      return AppContext
+    try (final ExecutionContext ctx = new ExecutionContext()) {
+      return ExecutionContext
           .getImplementorFactory()
           .getDefaultImplementor()
           .generateCustomHostIdentifier(payload);

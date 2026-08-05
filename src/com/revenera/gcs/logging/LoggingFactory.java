@@ -108,8 +108,6 @@ public class LoggingFactory {
     }
   }
 
-
-
   public static boolean willLog(final Level level) {
     return loggingLevel.get().compare(level) >= 0;
   }

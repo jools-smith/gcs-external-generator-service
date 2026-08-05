@@ -4,9 +4,9 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
+import com.revenera.gcs.logging.LogLevel;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionRecord;
-import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -30,16 +30,21 @@ public class Application implements ServletContextListener {
 
   static {
     //noinspection unused
-    try (final AppContext ctx =new AppContext()) {
+    try (final ExecutionContext ctx =new ExecutionContext()) {
       final Level level = Level.valueOf(
-          AppContext.getApplicationProperties().getLoggingLevel().toUpperCase());
+          ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
       LoggingFactory.setLoggingLevel(level);
 
       logger.info().log("set logging level to", level);
+
+      Beans.loggingContextFactory.logger().log(LogLevel.INFO, "{0} {1} {2}", "hello", "world", "...");
     }
     catch (final Throwable t) {
       logger.exception(t);
+    }
+    finally {
+//      Beans.loggingContextFactory.getLogger().log(LogLevel.ALL, "{} {} {}", "hello", "world", "...");
     }
   }
 
@@ -48,8 +53,8 @@ public class Application implements ServletContextListener {
   public Application() {
     logger.me(this);
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
-      logger.info().log("version", AppContext.getApplicationProperties().getVersionDetails());
+    try (final ExecutionContext ctx = new ExecutionContext()) {
+      logger.info().log("version", ExecutionContext.getApplicationProperties().getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -76,11 +81,11 @@ public class Application implements ServletContextListener {
 
   private void polling() {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
-      while (AppContext.getTransactionManager().hasTransactions()) {
+      while (ExecutionContext.getTransactionManager().hasTransactions()) {
         //TODO:need to depopulate the queue even if not serializing
-        final Map.Entry<Object, Object> content = AppContext.getTransactionManager().pollTransactions();
+        final Map.Entry<Object, Object> content = ExecutionContext.getTransactionManager().pollTransactions();
 
         if (content != null) {
           serializeToLogPath(content.getKey() + ".yaml",
@@ -96,7 +101,7 @@ public class Application implements ServletContextListener {
 
   private void logging() {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
 
       final List<String> messages = new ArrayList<>();
       while (LoggingFactory.hasMessages()) {
@@ -117,10 +122,10 @@ public class Application implements ServletContextListener {
 
   private void housekeeping() {
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
       //TODO:what is this supposed to do?
       logger.yaml(Level.DEBUG,
-          AppContext.getExecutionManager().getRecords().stream()
+          ExecutionContext.getExecutionManager().getRecords().stream()
               .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
               .collect(Collectors.toList()));
     }
@@ -136,7 +141,7 @@ public class Application implements ServletContextListener {
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
     //noinspection unused
-    try (final AppContext ctx = new AppContext()) {
+    try (final ExecutionContext ctx = new ExecutionContext()) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
       try (final AnnotationManager manager = new AnnotationManager()) {
@@ -163,7 +168,7 @@ public class Application implements ServletContextListener {
 
               imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 
-              AppContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
+              ExecutionContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
             }
             else {
               logger.error().log("invalid implementor",
@@ -175,7 +180,7 @@ public class Application implements ServletContextListener {
         }
       } // close annotation manager
 
-      final LicenseGeneratorServiceInterface implementor = AppContext.getImplementorFactory().getDefaultImplementor();
+      final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {
         logger.info().log("default implementor", implementor.getClass().getName());
       }
@@ -185,11 +190,11 @@ public class Application implements ServletContextListener {
 
       this.housekeeper.initialize();
 
-      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, AppContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
+      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
       this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
       this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
 
-      logger.yaml(Level.DEBUG, AppContext.getApplicationData());
+      logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
     }
     catch (final Throwable t) {
       logger.exception(t);

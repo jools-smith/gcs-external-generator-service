@@ -2,7 +2,7 @@ package com.revenera.gcs.implementor.diag;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
-import com.revenera.gcs.AppContext;
+import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.implementor.GeneratorBase;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -18,56 +18,56 @@ public final class DiagnosticLicenseGenerator extends GeneratorBase implements L
 
   @Override
   public PingResponse ping(final PingRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, PingResponse.class, super.doPing());
+    return ExecutionContext.injectResponse(this, PingResponse.class, super.doPing());
   }
 
   @Override
   public Status validateProduct(final ProductRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, Status.class, super.doValidateProduct(request));
+    return ExecutionContext.injectResponse(this, Status.class, super.doValidateProduct(request));
   }
 
   @Override
   public Status validateLicenseModel(final LicenseModelRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
-    return AppContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
+    return ExecutionContext.injectResponse(this, Status.class, super.doValidateLicenseModel(request));
   }
 
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateLicense");
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("consolidateFulfillments");
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateLicenseFilenames");
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateConsolidatedLicenseFilenames");
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
-    AppContext.injectRequest(this, request);
+    ExecutionContext.injectRequest(this, request);
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }

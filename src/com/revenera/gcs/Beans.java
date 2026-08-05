@@ -1,6 +1,7 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorFactory;
+import com.revenera.gcs.logging.LoggingContextFactory;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
 import org.apache.commons.lang3.time.StopWatch;
@@ -16,6 +17,9 @@ public class Beans {
   final static ImplementorFactory implementorFactory;
   final static DiagnosticsFactory diagnosticsFactory;
 
+  // TODO: debug for now...
+  final static LoggingContextFactory loggingContextFactory;
+
   static String web_inf;
 
   static {
@@ -24,6 +28,7 @@ public class Beans {
     applicationProperties = new ApplicationProperties();
     implementorFactory = new ImplementorFactory();
     diagnosticsFactory = new DiagnosticsFactory();
+    loggingContextFactory = new LoggingContextFactory();
   }
 
   public static void setResourcesRoot(final String value) {

@@ -14,49 +14,66 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AppContext implements AutoCloseable {
+class DataObject {
+  public final Frame frame;
+  public final Class<?> type;
+  public final Object data;
 
-  static class DataObject {
-    public final Frame frame;
-    public final Class<?> type;
-    public final Object data;
-
-    DataObject(final Frame frame, final Object data, final Class<?> type) {
-      this.frame = frame;
-      this.data = data;
-      this.type = type;
-    }
-
-    DataObject(final Frame frame, final Object data) {
-      this(frame, data, data.getClass());
-    }
+  DataObject(final Frame frame, final Object data, final Class<?> type) {
+    this.frame = frame;
+    this.data = data;
+    this.type = type;
   }
 
-  static class Transaction {
-    final Frame frame;
-    final Instant timestamp = Instant.now();
-
-    DataObject request;
-    DataObject response;
-    List<DataObject> payload;
-
-    Transaction(final Frame frame) {
-      this.frame = frame;
-    }
-
-    boolean hasData() {
-      return this.request != null || this.response != null || this.payload != null;
-    }
+  DataObject(final Frame frame, final Object data) {
+    this(frame, data, data.getClass());
   }
+}
+
+class Transaction {
+  final Frame frame;
+  final Instant timestamp = Instant.now();
+
+  DataObject request;
+  DataObject response;
+  List<DataObject> payload;
+
+  Transaction(final Frame frame) {
+    this.frame = frame;
+  }
+
+  boolean hasData() {
+    return this.request != null || this.response != null || this.payload != null;
+  }
+}
+
+//class Payload {
+//  final Frame frame;
+//  final String name;
+//  final Object data;
+//
+//  Payload(final Frame frame, final String name, final Object data) {
+//    this.frame = frame;
+//    this.name = name;
+//    this.data = data;
+//  }
+//
+//  public String getFrame() {
+//    return frame.getLocation();
+//  }
+//
+//  public Object getData() {
+//    return new AbstractMap.SimpleImmutableEntry<>(name, new Object[] {data.getClass().getSimpleName(),data});
+//  }
+//}
+
+
+public class ExecutionContext implements AutoCloseable {
 
   static final ThreadLocal<Transaction> context = new ThreadLocal<>();
 
-//  AppContext(final Object self) {
-//    context.set(new Transaction(new Frame(self.getClass())));
-//  }
-
-  public AppContext() {
-    context.set(new Transaction(new Frame(Frame.Depth.TWO)));
+  public ExecutionContext() {
+    context.set(new Transaction(new Frame()));
   }
 
   @Override
@@ -76,8 +93,6 @@ public class AppContext implements AutoCloseable {
 
     // clear down thread data
     context.remove();
-
-//    logger.debug().log("closed");
   }
 
   public static void injectRequest(final Object self, final Object data) {

@@ -1,29 +1,15 @@
 package com.revenera.gcs.logging;
 
 public enum Level {
-  ERROR(0, "ERROR"),
-  WARNING(1, "WARN"),
-  INFO(2, "INFO"),
-  DEBUG(4, "DEBUG"),
-  TRACE(8, "TRACE"),
-  // catchall
-  ALL(Integer.MAX_VALUE, "ALL");
+  ALL(0), ERROR(1), WARN(2), INFO(4), FULL(8), TRACE(16), DEBUG(32);
 
-  private final int value;
-  private final String text;
-
-  Level(final int value, final String text) {
+  Level(int value) {
     this.value = value;
-    this.text = text;
   }
+  private final int value;
 
   public int getValue() {
     return value;
-  }
-
-  @SuppressWarnings("unused")
-  public String getText() {
-    return text;
   }
 
   public int compare(final Level level) {

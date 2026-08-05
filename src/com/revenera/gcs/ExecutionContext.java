@@ -1,6 +1,8 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorManagement;
+import com.revenera.gcs.logging.Logging;
+import com.revenera.gcs.logging.LoggingContextFactory;
 import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
@@ -138,6 +140,14 @@ public class ExecutionContext implements AutoCloseable {
 
   public static TransactionManagement getTransactionManager() {
     return Beans.diagnosticsFactory;
+  }
+
+  public static LoggingContextFactory getLoggingContextFactory() {
+    return Beans.loggingContextFactory;
+  }
+
+  public static Logging logger() {
+    return Beans.loggingContextFactory.logger(Frame.Depth.THREE);
   }
 
   public static Map<String, Object> getApplicationData() {

@@ -141,7 +141,7 @@ public class LoggingFactory {
 
   @SuppressWarnings("unused")
   public ILogging warning() {
-    return new InnerLogging(Level.WARNING);
+    return new InnerLogging(Level.WARN);
   }
 
   public ILogging info() {

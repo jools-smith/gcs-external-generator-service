@@ -6,10 +6,12 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.stream.Collectors;
 
 public class LoggingContextFactory {
 
@@ -36,6 +38,15 @@ public class LoggingContextFactory {
       this.frame = new Frame(depth);
     }
 
+    private String formatMessage(final String format, final Object... params) {
+      try {
+        return MessageFormat.format(format, params);
+      }
+      catch (final IllegalArgumentException ignored) {
+        return format + "|" + Arrays.stream(params).map(Object::toString).collect(Collectors.joining("|"));
+      }
+    }
+
     @Override
     public void log(final LogLevel level, final String format, final Object... params) {
 
@@ -50,7 +61,7 @@ public class LoggingContextFactory {
             this.frame.getClassName(),
             this.frame.getMethodName(),
             this.frame.getLineNumber(),
-            MessageFormat.format(format, params));
+            formatMessage(format, params));
 
         formatter.flush();
 
@@ -62,6 +73,38 @@ public class LoggingContextFactory {
         messages.offer(outputMessage);
       }
     }
+
+    @Override
+    public void error(String message, Object... params) {
+      log(LogLevel.ERROR, message, params);
+    }
+
+    @Override
+    public void warn(String message, Object... params) {
+      log(LogLevel.WARN, message, params);
+    }
+
+    @Override
+    public void info(String message, Object... params) {
+      log(LogLevel.INFO, message, params);
+    }
+
+    @Override
+    public void full(String message, Object... params) {
+      log(LogLevel.FULL, message, params);
+    }
+
+    @Override
+    public void trace(String message, Object... params) {
+      log(LogLevel.TRACE, message, params);
+    }
+
+    @Override
+    public void debug(String message, Object... params) {
+      log(LogLevel.DEBUG, message, params);
+    }
+
+
 
     @Override
     public void exception(final Throwable t) {
@@ -79,6 +122,10 @@ public class LoggingContextFactory {
 
   public Logging logger() {
     return new Logger(Frame.Depth.TWO);
+  }
+
+  public Logging logger(final Frame.Depth depth) {
+    return new Logger(depth);
   }
 }
 

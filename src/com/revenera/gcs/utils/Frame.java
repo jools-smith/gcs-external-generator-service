@@ -57,6 +57,7 @@ public class Frame {
   }
 
   @JsonIgnore
+  @SuppressWarnings("unused")
   public String getFileName() {
     return frame.getFileName();
   }
@@ -67,6 +68,7 @@ public class Frame {
   }
 
   @JsonIgnore
+  @SuppressWarnings("unused")
   public String getLocation() {
     return getSimpleClassName() + "." + getMethodName() + "." + getLineNumber();
   }

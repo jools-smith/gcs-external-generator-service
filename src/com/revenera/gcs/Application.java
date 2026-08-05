@@ -4,7 +4,6 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
-import com.revenera.gcs.logging.LogLevel;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.utils.Serializer;
@@ -31,20 +30,22 @@ public class Application implements ServletContextListener {
   static {
     //noinspection unused
     try (final ExecutionContext ctx =new ExecutionContext()) {
-      final Level level = Level.valueOf(
-          ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
+      try {
+        final Level level = Level.valueOf(
+            ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
-      LoggingFactory.setLoggingLevel(level);
+        LoggingFactory.setLoggingLevel(level);
 
-      logger.info().log("set logging level to", level);
+        logger.info().log("set logging level to", level);
 
-      Beans.loggingContextFactory.logger().log(LogLevel.INFO, "{0} {1} {2}", "hello", "world", "...");
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
-    }
-    finally {
-//      Beans.loggingContextFactory.getLogger().log(LogLevel.ALL, "{} {} {}", "hello", "world", "...");
+        ExecutionContext.logger().full("{0} {1} {2}", "hello", "world", "...");
+      }
+      catch (final Throwable t) {
+        ExecutionContext.logger().exception(t);
+      }
+      finally {
+        ExecutionContext.logger().full("{0} {1} {2} {4}", "finally", "got", "here", "...");
+      }
     }
   }
 

@@ -24,7 +24,7 @@ public class RequestListener implements ServletRequestListener {
   public void requestDestroyed(ServletRequestEvent event) {
     //noinspection CodeBlock2Expr
     Optional.ofNullable((HttpServletRequest) event.getServletRequest()).ifPresent(req -> {
-      logger.get().debug("destroyed",
+      logger.get().debug("destroyed {0} {1} {2} ",
           req.getMethod(),
           req.getScheme(),
           req.getRequestURI());
@@ -35,7 +35,7 @@ public class RequestListener implements ServletRequestListener {
   public void requestInitialized(ServletRequestEvent event) {
     //noinspection CodeBlock2Expr
     Optional.ofNullable((HttpServletRequest) event.getServletRequest()).ifPresent(req -> {
-      logger.get().debug("initialized",
+      logger.get().debug("initialized {0} {1} {2} {3} {4} {5} {6}",
           req.getMethod(),
           req.getScheme(),
           req.getRequestURI(),

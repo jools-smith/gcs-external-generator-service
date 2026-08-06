@@ -1,6 +1,7 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorManagement;
+import com.revenera.gcs.logging.LoggingManager;
 import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
@@ -52,7 +53,15 @@ public class ExecutionContext implements AutoCloseable {
 
   static final ThreadLocal<LinkedList<Transaction>> context = new ThreadLocal<>();
 
+  private final boolean serialize;
+
   public ExecutionContext() {
+    this(true);
+  }
+
+  public ExecutionContext(final boolean serialize) {
+
+    this.serialize = serialize;
 
     if (context.get() == null) {
       context.set(new LinkedList<>());
@@ -65,15 +74,17 @@ public class ExecutionContext implements AutoCloseable {
   public void close() {
     final Transaction transaction = context.get().removeLast();
 
-    Beans.diagnosticsFactory.submitExecutionDetails(transaction.timestamp, transaction.frame);
+    if (this.serialize) {
+      Beans.diagnosticsFactory.submitExecutionDetails(transaction.timestamp, transaction.frame);
 
-    if (transaction.hasData()) {
-      Beans.diagnosticsFactory.submitTransaction(
-          transaction.frame,
-          transaction.timestamp,
-          transaction.request,
-          transaction.response,
-          transaction.payload);
+      if (transaction.hasData()) {
+        Beans.diagnosticsFactory.submitTransaction(
+            transaction.frame,
+            transaction.timestamp,
+            transaction.request,
+            transaction.response,
+            transaction.payload);
+      }
     }
 
     if (context.get().isEmpty()) {
@@ -127,6 +138,10 @@ public class ExecutionContext implements AutoCloseable {
 
   public static TransactionManagement getTransactionManager() {
     return Beans.diagnosticsFactory;
+  }
+
+  public static LoggingManager getLoggingManager() {
+    return  Beans.loggingManager;
   }
 
   public static Path getLogPath() {

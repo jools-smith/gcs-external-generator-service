@@ -35,7 +35,7 @@ public class Application implements ServletContextListener {
       final Level level = Level.valueOf(
           ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
-      LoggingFactory.setLoggingLevel(level);
+      ExecutionContext.getLoggingManager().setLevel(level);
 
       logger.get().info("set logging level to {0}", level);
     }
@@ -92,15 +92,15 @@ public class Application implements ServletContextListener {
   }
 
   private void logging() {
+    logger.in();
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
+      logger.in();
 
       final List<String> messages = new ArrayList<>();
-      while (LoggingFactory.hasMessages()) {
-        final String content = LoggingFactory.pollMessageQueue();
-        if (content != null) {
-          messages.add(content);
-        }
+
+      while (!ExecutionContext.getLoggingManager().isEmpty()) {
+        messages.add(ExecutionContext.getLoggingManager().popMessage());
       }
 
       if (!messages.isEmpty()) {
@@ -109,6 +109,9 @@ public class Application implements ServletContextListener {
     }
     catch (final Throwable t) {
       logger.exception(t);
+    }
+    finally {
+      logger.out();
     }
   }
 

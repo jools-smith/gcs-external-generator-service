@@ -21,10 +21,9 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
    */
   @Override
   public void attributeAdded(ServletRequestAttributeEvent event) {
-    logger.in();
     HttpServletRequest req = (HttpServletRequest) event.getServletRequest();
 
-    logger.get().debug(
+    logger.get().debug("attributeAdded {0} {1} {2} {3} {4} {5} {6}",
         req.getMethod(),
         req.getRequestURI(),
         req.getQueryString(),
@@ -38,11 +37,11 @@ public class RequestAttributeListener implements ServletRequestAttributeListener
 
   @Override
   public void attributeRemoved(ServletRequestAttributeEvent event) {
-    logger.get().debug(event.getName(), event.getValue());
+    logger.get().debug("{0} {1} {2}", event.getName(), event.getValue());
   }
 
   @Override
   public void attributeReplaced(ServletRequestAttributeEvent event) {
-    logger.get().debug(event.getName(), event.getValue());
+    logger.get().debug("{0} {1}",event.getName(), event.getValue());
   }
 }

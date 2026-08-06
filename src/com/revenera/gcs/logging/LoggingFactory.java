@@ -1,23 +1,19 @@
 package com.revenera.gcs.logging;
 
+import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.Serializer;
-import org.apache.commons.lang3.ClassUtils;
 
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-
 import java.util.Formatter;
 import java.util.Locale;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-abstract class LoggingManager {
+public class LoggingFactory {
   static final DateTimeFormatter tomcat_formatter = DateTimeFormatter
       .ofPattern("dd-MMM-yyyy HH:mm:ss.SSS", Locale.ENGLISH)
       .withZone(ZoneId.systemDefault());
@@ -28,36 +24,6 @@ abstract class LoggingManager {
           .withZone(ZoneId.systemDefault());
 
   static final Object lock = new Object();
-
-  static final Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
-
-  static final AtomicReference<Level> loggingLevel = new AtomicReference<>(Level.TRACE);
-
-  // Static Methods
-
-  public static boolean willLog(final Level level) {
-    return loggingLevel.get().compare(level) >= 0;
-  }
-
-  public static void setLoggingLevel(final Level level) {
-    loggingLevel.getAndSet(level);
-  }
-
-  @SuppressWarnings("unused")
-  public static Level getLoggingLevel() {
-    return loggingLevel.get();
-  }
-
-  public static boolean hasMessages() {
-    return !messageQueue.isEmpty();
-  }
-
-  public static String pollMessageQueue() {
-    return messageQueue.poll();
-  }
-}
-
-public class LoggingFactory extends LoggingManager {
 
   // genuinely is an inner class, cannot be static
   private class Logger implements Logging {
@@ -75,11 +41,11 @@ public class LoggingFactory extends LoggingManager {
 
       try (final Formatter formatter = new Formatter(appendable)) {
 
-        formatter.format("%s %5s [%s] %s %s (%d) %s",
+        formatter.format("%s %5s [%s] {%s} %s(%d) %s",
             timeFormatter.format(this.time),
             level,
             Thread.currentThread().getName(),
-            ClassUtils.getAbbreviatedName(this.frame.getClassName(), 64),
+            this.frame.getSimpleClassName(),
             this.frame.getMethodName(),
             this.frame.getLineNumber(),
             message);
@@ -91,13 +57,16 @@ public class LoggingFactory extends LoggingManager {
     }
 
     private void post(final Level level, final String message) {
-      synchronized (lock) {
-        final String logMessage = formatLogMessage(level, tomcat_formatter, message);
+      //noinspection unused
+      try (final ExecutionContext ctx = new ExecutionContext(false)) {
+        synchronized (lock) {
+          final String logMessage = formatLogMessage(level, tomcat_formatter, message);
 
-        System.out.println(logMessage);
+          System.out.println(logMessage);
 
-        if (willLog(level)) {
-          messageQueue.add(logMessage);
+          if (ExecutionContext.getLoggingManager().willLog(level)) {
+            ExecutionContext.getLoggingManager().postMessage(logMessage);
+          }
         }
       }
     }

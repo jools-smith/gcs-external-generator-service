@@ -2,6 +2,7 @@ package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.logging.LoggingManager;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -15,16 +16,22 @@ public class Beans {
   final static ApplicationProperties applicationProperties;
   final static ImplementorFactory implementorFactory;
   final static DiagnosticsFactory diagnosticsFactory;
-
+  final static LoggingManager loggingManager;
 
   static String web_inf;
 
   static {
-    logger.in();
-    stopwatch.start();
-    applicationProperties = new ApplicationProperties();
-    implementorFactory = new ImplementorFactory();
-    diagnosticsFactory = new DiagnosticsFactory();
+    try {
+      loggingManager = new LoggingManager();
+      applicationProperties = new ApplicationProperties();
+      implementorFactory = new ImplementorFactory();
+      diagnosticsFactory = new DiagnosticsFactory();
+      stopwatch.start();
+      logger.out();
+    }
+    finally {
+      logger.get().info("Beans initialized...");
+    }
   }
 
   public static void setResourcesRoot(final String value) {

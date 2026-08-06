@@ -37,7 +37,7 @@ public class ApplicationRequestFilter implements Filter {
 
     final HttpServletResponse resp = (HttpServletResponse) response;
 
-    logger.get().info("request",
+    logger.get().info("request {0} {1} {2} {3} {4}",
         req.getMethod(),
         req.getRequestURI(),
         req.getContentType(),

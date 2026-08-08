@@ -47,7 +47,7 @@ public final class ApplicationProperties {
     }
   }
 
-  public String getTimeStamp() {
+  public String getTimestamp() {
     return this.properties.get(Items.TIMESTAMP).toString();
   }
 
@@ -68,10 +68,7 @@ public final class ApplicationProperties {
     return this.properties.get(Items.TIME).toString();
   }
 
-  @SuppressWarnings("unused")
-  public String getTimestamp() {
-    return this.properties.get(Items.TIMESTAMP).toString();
-  }
+
 
   public int getHousekeepingFrequency() {
     return Integer.parseInt(this.properties.get(Items.HOUSEKEEPING_INTERVAL).toString());

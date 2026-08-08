@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Base64;
 
 public class Serializer {
@@ -37,6 +39,10 @@ public class Serializer {
 
   public static String safeSerializeJson(final Object payload) {
     return serialize(json_mapper, payload);
+  }
+
+  public static void serializeJsonIndented(final PrintWriter writer, final Object payload) throws IOException {
+    json_mapper_indented.writeValue(writer, payload);
   }
 
   public static String safeSerializeJsonIndented(final Object payload) {

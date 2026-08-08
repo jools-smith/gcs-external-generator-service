@@ -175,7 +175,7 @@ public class ExecutionContext implements AutoCloseable {
     return new HandyBag()
         .beginSection("build")
         .with("version", bv.getVersion())
-        .with("timestamp", bv.getTimeStamp())
+        .with("timestamp", bv.getTimestamp())
         .with("date", bv.getDate())
         .with("time", bv.getTime())
         .with("release", bv.getRelease())

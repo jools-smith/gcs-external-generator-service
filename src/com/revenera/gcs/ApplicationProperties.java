@@ -1,5 +1,6 @@
 package com.revenera.gcs;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import java.io.IOException;
@@ -7,6 +8,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@JsonPropertyOrder({
+    "version",
+    "release",
+    "timestamp",
+    "date",
+    "time",
+    "loggingLevel",
+    "loggingEcho",
+    "housekeepingFrequency",
+    "user",
+    "versionDetails",
+    "hash"
+})
 public final class ApplicationProperties {
   private static final LoggingFactory logger = LoggingFactory.create(ApplicationProperties.class);
 
@@ -103,5 +117,9 @@ public final class ApplicationProperties {
             this.properties.get(Items.USER))
         .map(Object::toString)
         .collect(Collectors.joining(" | "));
+  }
+
+  public String getHash() {
+    return String.format("%08X", hashCode());
   }
 }

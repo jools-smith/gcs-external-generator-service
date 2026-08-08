@@ -60,13 +60,16 @@ public class Application implements ServletContextListener {
   private void serializeToLogPath(final String filename, final List<String> content) throws IOException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      final String root = ExecutionContext.getLogPath().toRealPath().toString();
+      // only dump stuff if configured to do so
+      if (ExecutionContext.getApplicationProperties().getLoggingEcho()) {
+        final String root = ExecutionContext.getLogPath().toRealPath().toString();
 
-      if (Files.exists(Paths.get(root))) {
-        FileUtils.writeLines(
-            Paths.get(root, filename).toAbsolutePath().toFile().getAbsoluteFile(),
-            content,
-            true);
+        if (Files.exists(Paths.get(root))) {
+          FileUtils.writeLines(
+              Paths.get(root, filename).toAbsolutePath().toFile().getAbsoluteFile(),
+              content,
+              true);
+        }
       }
     }
   }

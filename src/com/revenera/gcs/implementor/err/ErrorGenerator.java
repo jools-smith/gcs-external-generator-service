@@ -1,4 +1,4 @@
-package com.revenera.gcs.implementor.diag;
+package com.revenera.gcs.implementor.err;
 
 import com.revenera.gcs.implementor.GeneratorImplementor;
 

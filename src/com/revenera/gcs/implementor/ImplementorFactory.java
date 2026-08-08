@@ -20,7 +20,7 @@ public class ImplementorFactory implements ImplementorManagement {
   @Override
   public void addImplementor(final TechnologyProperties imp, final boolean isDefault) {
 
-    logger.get().debug("adding implementor", imp.technologyId(), imp.getClass().getSimpleName());
+    logger.get().debug("adding {0} {1}", imp.technologyId(), imp.getClass().getSimpleName());
 
     this.implementors.add(imp);
 

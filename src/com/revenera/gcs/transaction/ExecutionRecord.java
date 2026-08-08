@@ -15,7 +15,7 @@ import java.time.Instant;
     "timeSinceUpdate"
 })
 public class ExecutionRecord {
-  private final String key;
+  private final String method;
   private Duration duration;
   private long count;
   private Instant updated;
@@ -28,7 +28,7 @@ public class ExecutionRecord {
   }
 
   ExecutionRecord(final Frame element) {
-    this.key = makeKey(element);
+    this.method = makeKey(element);
     this.duration = Duration.ZERO;
     this.count = 0;
     this.updated = Instant.now();
@@ -36,7 +36,7 @@ public class ExecutionRecord {
 
   @JsonIgnore
   public boolean matches(final Frame element) {
-    return this.key.equals(makeKey(element));
+    return this.method.equals(makeKey(element));
   }
 
   @JsonIgnore
@@ -53,7 +53,7 @@ public class ExecutionRecord {
   }
 
   public String getMethod() {
-    return this.key;
+    return this.method;
   }
 
   public double getTotalDuration() {

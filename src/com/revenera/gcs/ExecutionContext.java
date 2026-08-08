@@ -6,15 +6,17 @@ import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
 import com.revenera.gcs.utils.Frame;
+import com.revenera.gcs.utils.HandyBag;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 class DataObject {
   public final Frame frame;
@@ -55,19 +57,21 @@ public class ExecutionContext implements AutoCloseable {
 
   private final boolean serialize;
 
-  public ExecutionContext() {
-    this(true);
-  }
-
-  public ExecutionContext(final boolean serialize) {
-
+  private ExecutionContext(final Frame frame, final boolean serialize) {
     this.serialize = serialize;
 
     if (context.get() == null) {
       context.set(new LinkedList<>());
     }
+    context.get().add(new Transaction(frame));
+  }
 
-    context.get().add(new Transaction(new Frame(Frame.Depth.ONE)));
+  public ExecutionContext() {
+    this(new Frame(Frame.Depth.ONE), true);
+  }
+
+  public ExecutionContext(final boolean serialize) {
+    this(new Frame(Frame.Depth.ONE), serialize);
   }
 
   @Override
@@ -141,77 +145,75 @@ public class ExecutionContext implements AutoCloseable {
   }
 
   public static LoggingManager getLoggingManager() {
-    return  Beans.loggingManager;
+    return Beans.loggingManager;
   }
 
   public static Path getLogPath() {
     return Beans.getLogPath();
   }
 
-  public static Map<String, Object> getApplicationData() {
+  public static HandyBag getRecordsBag() {
+    final HandyBag bag = new HandyBag();
+    Beans.diagnosticsFactory.getRecords().stream()
+        .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
+        .forEach(x ->
+            bag.beginSection(x.getMethod())
+                .with("visits", x.getCount())
+                .with("mean latency", x.getMeanLatency())
+                .with("total sojourn", x.getTotalDuration()));
 
-    return new LinkedHashMap<String, Object>() {
-      {
-        put("build", new LinkedHashMap<String, Object>() {
-          {
-            final ApplicationProperties bv = getApplicationProperties();
+    return bag;
+  }
 
-            put("version", bv.getVersion());
-            put("timestamp", bv.getTimeStamp());
-            put("date", bv.getDate());
-            put("time", bv.getTime());
-            put("release", bv.getRelease());
-            put("user", bv.getUser());
-            put("logging_level", bv.getLoggingLevel());
-            put("housekeeping", bv.getHousekeepingFrequency());
-          }
-        });
+  public static HandyBag getApplicationData() {
+    final ApplicationProperties bv = getApplicationProperties();
 
-        put("system", new LinkedHashMap<String, Object>() {
-          {
-            put("timestamp", Instant.now().toString());
-            put("up_time", Beans.stopwatch.getDuration().toString());
-            put("user_name", SystemProperties.getUserName("unknown"));
-            put("host_name", SystemUtils.getHostName());
-            put("resource_path", Beans.getResourcePath().toAbsolutePath().toString());
-          }
-        });
+    final Runtime runtime = Runtime.getRuntime();
 
-        final Runtime runtime = Runtime.getRuntime();
-        put("environment", new LinkedHashMap<String, Object>() {
-          {
-            Function<Long, String> tomb = v -> (v / (1024 * 1024)) + "MB";
+    final Function<Long, String> tomb = v -> (v / (1024 * 1024)) + "MB";
 
-            put("processors", runtime.availableProcessors());
-            put("free_memory", tomb.apply(runtime.freeMemory()));
-            put("total_memory", tomb.apply(runtime.totalMemory()));
-            put("max_memory", tomb.apply(runtime.maxMemory()));
-          }
-        });
+    return new HandyBag()
+        .beginSection("build")
+        .with("version", bv.getVersion())
+        .with("timestamp", bv.getTimeStamp())
+        .with("date", bv.getDate())
+        .with("time", bv.getTime())
+        .with("release", bv.getRelease())
+        .with("user", bv.getUser())
+        .with("logging_level", bv.getLoggingLevel())
+        .with("housekeeping-frequency", bv.getHousekeepingFrequency())
+        .with("echo-log", bv.getLoggingEcho())
+        .endSection()
 
-        put("operating-system", new LinkedHashMap<String, Object>() {
-          {
-            put("os_name", SystemUtils.OS_NAME);
-            put("os_version", SystemUtils.OS_VERSION);
-            put("os_arch", SystemUtils.OS_ARCH);
-          }
-        });
+        .beginSection("system")
+        .with("timestamp", Instant.now().toString())
+        .with("up_time", Beans.stopwatch.getDuration().toString())
+        .with("user_name", SystemProperties.getUserName("unknown"))
+        .with("host_name", SystemUtils.getHostName())
+        .with("resource_path", Beans.getResourcePath().toAbsolutePath().toString())
+        .endSection()
 
-        put("java", new LinkedHashMap<String, Object>() {
-          {
-            put("java_version", SystemUtils.JAVA_VERSION);
-            put("java_vendor", SystemUtils.JAVA_VENDOR);
-            put("java_class_version", SystemUtils.JAVA_CLASS_VERSION);
-            put("java_vm_name", SystemUtils.JAVA_VM_NAME);
-            put("java_vm_info", SystemUtils.JAVA_VM_INFO);
-          }
-        });
+        .beginSection("environment")
+        .with("processors", runtime.availableProcessors())
+        .with("free_memory", tomb.apply(runtime.freeMemory()))
+        .with("total_memory", tomb.apply(runtime.totalMemory()))
+        .with("max_memory", tomb.apply(runtime.maxMemory()))
+        .endSection()
 
-        put("diagnostics", Beans.diagnosticsFactory.getRecords().stream()
-            .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
-            .collect(Collectors.toList()));
+        .beginSection("environment")
+        .with("os_name", SystemUtils.OS_NAME)
+        .with("os_version", SystemUtils.OS_VERSION)
+        .with("os_arch", SystemUtils.OS_ARCH)
+        .endSection()
 
-      }
-    };
+        .beginSection("environment")
+        .with("java_version", SystemUtils.JAVA_VERSION)
+        .with("java_vendor", SystemUtils.JAVA_VENDOR)
+        .with("java_class_version", SystemUtils.JAVA_CLASS_VERSION)
+        .with("java_vm_name", SystemUtils.JAVA_VM_NAME)
+        .with("java_vm_info", SystemUtils.JAVA_VM_INFO)
+        .endSection()
+
+        .with("diagnostics", getRecordsBag());
   }
 }

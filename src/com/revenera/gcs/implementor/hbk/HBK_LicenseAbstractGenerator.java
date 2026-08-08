@@ -3,7 +3,7 @@ package com.revenera.gcs.implementor.hbk;
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.ExecutionContext;
-import com.revenera.gcs.implementor.GeneratorBase;
+import com.revenera.gcs.implementor.AbstractGenerator;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.utils.Serializer;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @GeneratorImplementor(technologyId = "HBK", technologyName = "HBK/LMX License Technology", isDefault = false)
-public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGeneratorServiceInterface {
+public class HBK_LicenseAbstractGenerator extends AbstractGenerator implements LicenseGeneratorServiceInterface {
 
   final Function<XMLGregorianCalendar, String> parse_expiration_date = date ->
       date == null ? "perpetual" : date.toXMLFormat();
@@ -220,5 +220,8 @@ public class HBK_LicenseGenerator extends GeneratorBase implements LicenseGenera
     throw new NotImplementedException("generateCustomHostIdentifier");
   }
 
-
+  @Override
+  public void registerConfirmation() {
+    logger.get().info("Registering Confirmation {0} {1} {2}", this.getClass().getSimpleName(), this.id, this.name);
+  }
 }

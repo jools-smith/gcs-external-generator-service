@@ -12,4 +12,7 @@ public interface TechnologyProperties {
   LicenseGeneratorServiceInterface generator();
 
   void configureTechnologyProperties(String id, String name);
+
+  // this must be implemented by the real generators
+  void registerConfirmation();
 }

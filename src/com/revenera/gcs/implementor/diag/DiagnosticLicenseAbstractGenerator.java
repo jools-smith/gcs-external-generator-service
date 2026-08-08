@@ -1,17 +1,15 @@
-package com.revenera.gcs.implementor.none;
+package com.revenera.gcs.implementor.diag;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.ExecutionContext;
-import com.revenera.gcs.implementor.GeneratorBase;
+import com.revenera.gcs.implementor.AbstractGenerator;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.util.Collections;
-
 @SuppressWarnings("unused")
-@GeneratorImplementor(technologyId = "NONE", technologyName = "No Enforcement License Technology", isDefault = false)
-public class NO_LicenseGenerator extends GeneratorBase implements LicenseGeneratorServiceInterface {
+@GeneratorImplementor(technologyId = "DEF", technologyName = "Unimplemented License Technology", isDefault = true)
+public final class DiagnosticLicenseAbstractGenerator extends AbstractGenerator implements LicenseGeneratorServiceInterface  {
 
   @Override
   public LicenseGeneratorServiceInterface generator() {
@@ -26,42 +24,6 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
   }
 
   @Override
-  public GeneratorResponse generateLicense(final GeneratorRequest request) {
-    logger.in();
-
-    ExecutionContext.injectRequest(request);
-
-    return ExecutionContext.injectResponse(new GeneratorResponse() {
-      {
-        this.licenseFileName = "License";
-        this.licenseText = "No license available";
-
-        this.licenseFiles = NO_LicenseGenerator.super.makeLicenseFiles(request.getLicenseFileDefinitions(), "No license available", null);
-      }
-    });
-  }
-
-  @Override
-  public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
-    logger.in();
-
-    ExecutionContext.injectRequest(request);
-
-    return ExecutionContext.injectResponse(new ConsolidatedLicense() {
-      {
-        this.fulfillments = request.getFulfillments();
-
-        this.licFiles = Collections.singletonList(new LicenseFileMapItem() {
-          {
-            this.name = "License";
-            this.value = "No license available";
-          }
-        });
-      }
-    });
-  }
-
-  @Override
   public Status validateProduct(final ProductRequest request) {
     ExecutionContext.injectRequest(request);
 
@@ -73,6 +35,20 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
     ExecutionContext.injectRequest(request);
 
     return ExecutionContext.injectResponse(super.doValidateLicenseModel(request));
+  }
+
+  @Override
+  public GeneratorResponse generateLicense(GeneratorRequest request) {
+    ExecutionContext.injectRequest(request);
+
+    throw new NotImplementedException("generateLicense");
+  }
+
+  @Override
+  public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
+    ExecutionContext.injectRequest(request);
+
+    throw new NotImplementedException("consolidateFulfillments");
   }
 
   @Override
@@ -95,4 +71,10 @@ public class NO_LicenseGenerator extends GeneratorBase implements LicenseGenerat
 
     throw new NotImplementedException("generateCustomHostIdentifier");
   }
+
+  @Override
+  public void registerConfirmation() {
+    logger.get().info("Registering Confirmation {0} {1} {2}", this.getClass().getSimpleName(), this.id, this.name);
+  }
 }
+

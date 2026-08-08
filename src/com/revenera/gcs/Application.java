@@ -5,7 +5,6 @@ import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
-import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -13,12 +12,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * The root of the service, registered as a listener will set stuff up when the context is initialized
@@ -92,10 +92,8 @@ public class Application implements ServletContextListener {
   }
 
   private void logging() {
-    logger.in();
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      logger.in();
 
       final List<String> messages = new ArrayList<>();
 
@@ -108,24 +106,31 @@ public class Application implements ServletContextListener {
       }
     }
     catch (final Throwable t) {
+      System.out.printf("EXCEPTION %s %s%n", t.getClass().getName(), t.getMessage());
       logger.exception(t);
-    }
-    finally {
-      logger.out();
     }
   }
 
   private void housekeeping() {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      //TODO:what is this supposed to do?
-      logger.yaml(Level.DEBUG,
-          ExecutionContext.getExecutionManager().getRecords().stream()
-              .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
-              .collect(Collectors.toList()));
+      logger.yaml(Level.DEBUG, ExecutionContext.getRecordsBag());
     }
     catch (final Throwable t) {
       logger.exception(t);
+    }
+  }
+
+  Object servletContext;
+
+  private void listAttributes(final ServletContextEvent event) {
+    final Enumeration<String> itt = event.getServletContext().getAttributeNames();
+    while (itt.hasMoreElements()) {
+      final String name = itt.nextElement();
+
+      final Object value = event.getServletContext().getAttribute(name);
+
+      logger.get().debug("{0} {1}", name, value != null ? value.toString() : "null");
     }
   }
 
@@ -139,6 +144,8 @@ public class Application implements ServletContextListener {
     try (final ExecutionContext ctx = new ExecutionContext()) {
       Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
+      listAttributes(event);
+
       try (final AnnotationManager manager = new AnnotationManager()) {
 
         final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
@@ -151,7 +158,7 @@ public class Application implements ServletContextListener {
 
             final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-            logger.get().info("found",
+            logger.get().info("found id:{0} name:{1} default:{2} {3}",
                 annotation.technologyId(),
                 annotation.technologyName(),
                 annotation.isDefault(),
@@ -159,14 +166,18 @@ public class Application implements ServletContextListener {
 
             if (TechnologyProperties.class.isAssignableFrom(type)) {
 
-              final TechnologyProperties imp = (TechnologyProperties) type.newInstance();
+              final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
 
-              imp.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
+              // set up properties from the annotations
+              technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
 
-              ExecutionContext.getImplementorFactory().addImplementor(imp, annotation.isDefault());
+              ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
+
+              // let the implementor know it's been registered
+              technologyImplementor.registerConfirmation();
             }
             else {
-              logger.get().warn("invalid implementor",
+              logger.get().warn("invalid id:{0} name:{1} {2}",
                   annotation.technologyId(),
                   annotation.technologyName(),
                   type.getSimpleName());
@@ -177,10 +188,10 @@ public class Application implements ServletContextListener {
 
       final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
       if (implementor != null) {
-        logger.get().info("default implementor", implementor.getClass().getName());
+        logger.get().info("default implementor {0}", implementor.getClass().getName());
       }
       else {
-        throw new RuntimeException("No default implementor found");
+        logger.get().warn("no default implementor found");
       }
 
       this.housekeeper.initialize();

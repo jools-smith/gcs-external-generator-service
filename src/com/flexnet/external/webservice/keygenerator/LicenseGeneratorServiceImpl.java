@@ -16,14 +16,17 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ignored = new ExecutionContext()) {
-      // invoke implementor
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .ping(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        // invoke implementor
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .ping(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -31,14 +34,17 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public Status validateProduct(final ProductRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      // invoke implementor
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .validateProduct(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        // invoke implementor
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .validateProduct(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -46,14 +52,16 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public Status validateLicenseModel(final LicenseModelRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .validateLicenseModel(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .validateLicenseModel(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -61,15 +69,17 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public GeneratorResponse generateLicense(final GeneratorRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .generateLicense(payload);
 
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .generateLicense(payload);
-
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -77,14 +87,16 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .consolidateFulfillments(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .consolidateFulfillments(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -92,14 +104,16 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .generateLicenseFilenames(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .generateLicenseFilenames(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -109,14 +123,16 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-
-      return ExecutionContext
-          .getImplementorFactory()
-          .getImplementor(ServiceHelper.getLicenseTechnology(payload))
-          .generateConsolidatedLicenseFilenames(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getImplementor(ServiceHelper.getLicenseTechnology(payload))
+            .generateConsolidatedLicenseFilenames(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 
@@ -124,13 +140,16 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public String generateCustomHostIdentifier(final HostIdRequest payload) throws LicGeneratorException {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      return ExecutionContext
-          .getImplementorFactory()
-          .getDefaultImplementor()
-          .generateCustomHostIdentifier(payload);
-    }
-    catch (final Throwable t) {
-      throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      try {
+        return ExecutionContext
+            .getImplementorFactory()
+            .getDefaultImplementor()
+            .generateCustomHostIdentifier(payload);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+      }
     }
   }
 }

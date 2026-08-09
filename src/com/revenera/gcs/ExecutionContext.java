@@ -70,7 +70,7 @@ public class ExecutionContext implements AutoCloseable {
     this(new Frame(Frame.Depth.ONE), true);
   }
 
-  public ExecutionContext(final boolean serialize) {
+  private ExecutionContext(final boolean serialize) {
     this(new Frame(Frame.Depth.ONE), serialize);
   }
 

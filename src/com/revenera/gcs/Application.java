@@ -11,13 +11,7 @@ import org.apache.commons.io.FileUtils;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -36,96 +30,104 @@ public class Application implements ServletContextListener {
   static {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
+      try {
+        final Level level = Level.valueOf(
+            ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
 
-      final Level level = Level.valueOf(
-          ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
+        ExecutionContext.getLoggingManager().setLevel(level);
 
-      ExecutionContext.getLoggingManager().setLevel(level);
-
-      logger.get().info("set logging level to {0}", level);
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
+        logger.get().info("set logging level to {0}", level);
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+      }
     }
   }
 
   private final Housekeeper housekeeper = new Housekeeper();
 
   public Application() {
-    logger.me(this);
+
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      logger.get().info("version", ExecutionContext.getApplicationProperties().getVersionDetails());
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
+      logger.me(this);
+
+      try {
+        logger.get().info("version", ExecutionContext.getApplicationProperties().getVersionDetails());
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+      }
     }
   }
 
   private void serializeToLogPath(final String filename, final List<String> content) throws IOException {
     //noinspection unused
-    try (final ExecutionContext ctx = new ExecutionContext()) {
-      // only dump stuff if configured to do so
-      if (ExecutionContext.getApplicationProperties().getLoggingEcho()) {
-        final String root = ExecutionContext.getLogPath().toRealPath().toString();
 
-        if (Files.exists(Paths.get(root))) {
-          FileUtils.writeLines(
-              Paths.get(root, filename).toAbsolutePath().toFile().getAbsoluteFile(),
-              content,
-              true);
-        }
+    if (ExecutionContext.getApplicationProperties().getLoggingEcho()) {
+      final String root = ExecutionContext.getLogPath().toRealPath().toString();
+
+      if (Files.exists(Paths.get(root))) {
+        FileUtils.writeLines(
+            Paths.get(root, filename).toAbsolutePath().toFile().getAbsoluteFile(),
+            content,
+            true);
       }
     }
+
   }
 
   private void polling() {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
+      try {
+        while (ExecutionContext.getTransactionManager().hasTransactions()) {
+          //TODO:need to depopulate the queue even if not serializing
+          final Map.Entry<Object, Object> content = ExecutionContext.getTransactionManager().pollTransactions();
 
-      while (ExecutionContext.getTransactionManager().hasTransactions()) {
-        //TODO:need to depopulate the queue even if not serializing
-        final Map.Entry<Object, Object> content = ExecutionContext.getTransactionManager().pollTransactions();
-
-        if (content != null) {
-          serializeToLogPath(content.getKey() + ".yaml",
-              Collections.singletonList(
-                  Serializer.safeSerializeYaml(content.getValue())));
+          if (content != null) {
+            serializeToLogPath(content.getKey() + ".yaml",
+                Collections.singletonList(
+                    Serializer.safeSerializeYaml(content.getValue())));
+          }
         }
       }
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
+      catch (final Throwable t) {
+        logger.exception(t);
+      }
     }
   }
 
   private void logging() {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
+      try {
+        final List<String> messages = new ArrayList<>();
 
-      final List<String> messages = new ArrayList<>();
+        while (!ExecutionContext.getLoggingManager().isEmpty()) {
+          messages.add(ExecutionContext.getLoggingManager().popMessage());
+        }
 
-      while (!ExecutionContext.getLoggingManager().isEmpty()) {
-        messages.add(ExecutionContext.getLoggingManager().popMessage());
+        if (!messages.isEmpty()) {
+          serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
+        }
       }
-
-      if (!messages.isEmpty()) {
-        serializeToLogPath(LocalDate.now() + ".revenera.log", messages);
+      catch (final Throwable t) {
+        System.out.printf("EXCEPTION %s %s%n", t.getClass().getName(), t.getMessage());
+        logger.exception(t);
       }
-    }
-    catch (final Throwable t) {
-      System.out.printf("EXCEPTION %s %s%n", t.getClass().getName(), t.getMessage());
-      logger.exception(t);
     }
   }
 
   private void housekeeping() {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      logger.yaml(Level.DEBUG, ExecutionContext.getRecordsBag());
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
+      try {
+        logger.yaml(Level.DEBUG, ExecutionContext.getRecordsBag());
+      }
+      catch (final Throwable t) {
+        logger.exception(t);
+      }
     }
   }
 
@@ -147,74 +149,78 @@ public class Application implements ServletContextListener {
    */
   @Override
   public void contextInitialized(final ServletContextEvent event) {
-    logger.in();
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
+      logger.in();
 
-      listAttributes(event);
+      try {
+        Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
-      try (final AnnotationManager manager = new AnnotationManager()) {
+        listAttributes(event);
 
-        final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
+        try (final AnnotationManager manager = new AnnotationManager()) {
 
-        for (final String typename : files) {
+          final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
 
-          final Class<?> type = Class.forName(typename);
+          for (final String typename : files) {
 
-          if (type.isAnnotationPresent(GeneratorImplementor.class)) {
+            final Class<?> type = Class.forName(typename);
 
-            final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
+            if (type.isAnnotationPresent(GeneratorImplementor.class)) {
 
-            logger.get().info("found id:{0} name:{1} default:{2} {3}",
-                annotation.technologyId(),
-                annotation.technologyName(),
-                annotation.isDefault(),
-                type.getSimpleName());
+              final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-            if (TechnologyProperties.class.isAssignableFrom(type)) {
-
-              final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
-
-              // set up properties from the annotations
-              technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
-
-              ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
-
-              // let the implementor know it's been registered
-              technologyImplementor.registerConfirmation();
-            }
-            else {
-              logger.get().warn("invalid id:{0} name:{1} {2}",
+              logger.get().info("found id:{0} name:{1} default:{2} {3}",
                   annotation.technologyId(),
                   annotation.technologyName(),
+                  annotation.isDefault(),
                   type.getSimpleName());
+
+              if (TechnologyProperties.class.isAssignableFrom(type)) {
+
+                final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
+
+                // set up properties from the annotations
+                technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
+
+                ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
+
+                // let the implementor know it's been registered
+                technologyImplementor.registerConfirmation();
+              }
+              else {
+                logger.get().warn("invalid id:{0} name:{1} {2}",
+                    annotation.technologyId(),
+                    annotation.technologyName(),
+                    type.getSimpleName());
+              }
             }
           }
+        } // close annotation manager
+
+        final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
+        if (implementor != null) {
+          logger.get().info("default implementor {0}", implementor.getClass().getName());
         }
-      } // close annotation manager
+        else {
+          logger.get().warn("no default implementor found");
+        }
 
-      final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
-      if (implementor != null) {
-        logger.get().info("default implementor {0}", implementor.getClass().getName());
+        this.housekeeper.initialize();
+
+        this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
+        this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
+        this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
       }
-      else {
-        logger.get().warn("no default implementor found");
+      catch (final Throwable t) {
+        logger.exception(t);
+      }
+      finally {
+        logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
+        logger.out();
       }
 
-      this.housekeeper.initialize();
-
-      this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
-      this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
-      this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
     }
-    catch (final Throwable t) {
-      logger.exception(t);
-    }
-    finally {
-      logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
-    }
-    logger.out();
   }
 
   private enum Timers {

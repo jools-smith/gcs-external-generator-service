@@ -59,7 +59,7 @@ public class LoggingFactory {
 
     private void post(final Level level, final String message) {
       //noinspection unused
-      try (final ExecutionContext ctx = new ExecutionContext(false)) {
+//      try (final ExecutionContext ctx = new ExecutionContext(false)) {
         synchronized (lock) {
           final String logMessage = formatLogMessage(level, tomcat_formatter, message);
 
@@ -69,7 +69,7 @@ public class LoggingFactory {
             ExecutionContext.getLoggingManager().postMessage(logMessage);
           }
         }
-      }
+//      }
     }
 
     @Override

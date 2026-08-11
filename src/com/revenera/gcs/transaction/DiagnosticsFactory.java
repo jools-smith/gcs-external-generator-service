@@ -1,7 +1,6 @@
 package com.revenera.gcs.transaction;
 
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Frame;
 
 import java.time.Duration;

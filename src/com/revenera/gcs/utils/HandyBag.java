@@ -5,13 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class HandyBag extends LinkedHashMap<String, Object> {
   HandyBag parent;
-  //final Map<String, Object> elements = new LinkedHashMap<>();
 
   public HandyBag() {
     this.parent = this;
@@ -35,6 +33,7 @@ public final class HandyBag extends LinkedHashMap<String, Object> {
   }
 
   @JsonIgnore
+  @SuppressWarnings("unused")
   public HandyBag with(final String key, final Object... values) {
     put(key, Arrays.asList(values));
 
@@ -62,6 +61,7 @@ public final class HandyBag extends LinkedHashMap<String, Object> {
     return this.parent;
   }
 
+  @SuppressWarnings("unused")
   public Map<String, Object> getElements() {
     return this;
   }

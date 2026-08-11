@@ -70,9 +70,9 @@ public class ExecutionContext implements AutoCloseable {
     this(new Frame(Frame.Depth.ONE), true);
   }
 
-  private ExecutionContext(final boolean serialize) {
-    this(new Frame(Frame.Depth.ONE), serialize);
-  }
+//  private ExecutionContext(final boolean serialize) {
+//    this(new Frame(Frame.Depth.ONE), serialize);
+//  }
 
   @Override
   public void close() {
@@ -136,6 +136,7 @@ public class ExecutionContext implements AutoCloseable {
     return Beans.implementorFactory;
   }
 
+  @SuppressWarnings("unused")
   public static ExecutionManagement getExecutionManager() {
     return Beans.diagnosticsFactory;
   }

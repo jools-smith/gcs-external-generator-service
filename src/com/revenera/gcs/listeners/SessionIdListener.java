@@ -1,11 +1,11 @@
 package com.revenera.gcs.listeners;
 
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
+
 @SuppressWarnings("unused")
 @WebListener
 public class SessionIdListener extends Loggable implements HttpSessionIdListener {

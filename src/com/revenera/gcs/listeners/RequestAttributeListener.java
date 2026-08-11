@@ -1,7 +1,6 @@
 package com.revenera.gcs.listeners;
 
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;

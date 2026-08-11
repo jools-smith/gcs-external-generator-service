@@ -154,12 +154,11 @@ public class ControlServlet extends HttpServlet {
         logger.get().info("injecting parameter " + key + ": " + Arrays.toString(value)));
 
     if (map.containsKey(InjectTypes.ECHO.value)) {
-
+      //TODO:fix this
     }
 
-    if (map.containsKey(InjectTypes.LEVEL
-        .value)) {
-
+    if (map.containsKey(InjectTypes.LEVEL.value)) {
+      //TODO:fix this
     }
 
     resp.setStatus(HttpServletResponse.SC_OK);

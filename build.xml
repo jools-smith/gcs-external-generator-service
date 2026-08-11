@@ -13,7 +13,7 @@
     <property name="generated" location="${BASE}/generated" />
     <property name="generated-src" location="${BASE}/generated/src" />
     <property name="schema-loc" location="${BASE}/schema" />
-    <property name="warfile" location="${BASE}/revenera-gcs.war" />
+    <property name="warfile" location="${BASE}/revenera-gcs##1.0.0.war" />
     <property name="zipped-sources" location="${BASE}/revenera-gcs.zip" />
     <property name="repository" location="${BASE}/repository" />
     <property name="build.props" location="build.properties" />

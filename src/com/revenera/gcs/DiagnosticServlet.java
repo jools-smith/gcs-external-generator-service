@@ -101,12 +101,6 @@ public class DiagnosticServlet extends HttpServlet {
     return  "Revenera GCS Diagnostic Servlet v1.0";
   }
 
-  @Override
-  protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    logger.in();
-    super.doTrace(req, resp);
-  }
-
   /** IMPLEMENTORS **/
 
   private void getHealth(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
@@ -158,15 +152,5 @@ public class DiagnosticServlet extends HttpServlet {
     Serializer.serializeJsonIndented(resp.getWriter(), bag);
     resp.setStatus(HttpServletResponse.SC_OK);
 
-  }
-
-  private void start(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
-    resp.getWriter().write("STARTED");
-    resp.setStatus(HttpServletResponse.SC_OK);
-  }
-
-  private void shutdown(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
-    resp.getWriter().write("SHUTDOWN");
-    resp.setStatus(HttpServletResponse.SC_OK);
   }
 }

@@ -8,6 +8,7 @@ public enum Level {
   }
   private final int value;
 
+  @SuppressWarnings("unused")
   public int getValue() {
     return value;
   }

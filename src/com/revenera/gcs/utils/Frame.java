@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 
 @JsonPropertyOrder({
     "className",
@@ -49,6 +48,7 @@ public class Frame extends Loggable {
   }
 
   @JsonIgnore
+  @SuppressWarnings("unused")
   public String getClassName() {
     return frame.getClassName();
   }

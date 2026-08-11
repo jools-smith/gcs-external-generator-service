@@ -1,7 +1,6 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;

@@ -2,10 +2,12 @@ package com.revenera.gcs;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.revenera.gcs.logging.Loggable;
-import com.revenera.gcs.logging.LoggingFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -119,6 +121,7 @@ public final class ApplicationProperties extends Loggable {
         .collect(Collectors.joining(" | "));
   }
 
+  @SuppressWarnings("unused")
   public String getHash() {
     return String.format("%08X", hashCode());
   }

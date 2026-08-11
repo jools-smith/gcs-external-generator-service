@@ -3,7 +3,6 @@ package com.revenera.gcs.implementor;
 import com.flexnet.external.type.*;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.ExecutionContext;
-import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.HandyBag;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.SystemProperties;

@@ -96,10 +96,10 @@ public class LoggingFactory {
           frame.getLineNumber());
     }
 
-    @Override
-    public void array(Level level, String caption, Object... params) {
-      log(level, "{0} | {1}", caption, Stream.of(params).map(Object::toString).collect(Collectors.joining("|")));
-    }
+//    @Override
+//    public void array(Level level, String caption, Object... params) {
+//      log(level, "{0} | {1}", caption, Stream.of(params).map(Object::toString).collect(Collectors.joining("|")));
+//    }
   }
 
   final Class<?> type;
@@ -128,11 +128,11 @@ public class LoggingFactory {
 
   @SuppressWarnings("unused")
   public void json(final Level level, final Object obj) {
-    new Logger().array(level, obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
+    new Logger().log(level, "{0} {1}", obj.getClass().getName(), Serializer.safeSerializeJsonIndented(obj));
   }
 
   public void yaml(final Level level, final Object obj) {
-    new Logger().array(level, obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
+    new Logger().log(level, "{0} {1}", obj.getClass().getName(), Serializer.safeSerializeYaml(obj));
   }
 
   //ERROR

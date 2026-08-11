@@ -12,6 +12,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -131,8 +132,6 @@ public class Application implements ServletContextListener {
     }
   }
 
-  Object servletContext;
-
   private void listAttributes(final ServletContextEvent event) {
     final Enumeration<String> itt = event.getServletContext().getAttributeNames();
     while (itt.hasMoreElements()) {
@@ -144,73 +143,82 @@ public class Application implements ServletContextListener {
     }
   }
 
+  private LicenseGeneratorServiceInterface configureImplementors() throws Exception {
+    logger.in();
+    try (final AnnotationManager manager = new AnnotationManager()) {
+
+      final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
+
+      for (final String typename : files) {
+
+        final Class<?> type = Class.forName(typename);
+
+        if (type.isAnnotationPresent(GeneratorImplementor.class)) {
+
+          final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
+
+          logger.get().info("found id:{0} name:{1} default:{2} {3}",
+              annotation.technologyId(),
+              annotation.technologyName(),
+              annotation.isDefault(),
+              type.getSimpleName());
+
+          if (TechnologyProperties.class.isAssignableFrom(type)) {
+
+            final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
+
+            // set up properties from the annotations
+            technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
+
+            ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
+
+            // let the implementor know it's been registered
+            technologyImplementor.registerConfirmation();
+          }
+          else {
+            logger.get().warn("invalid id:{0} name:{1} {2}",
+                annotation.technologyId(),
+                annotation.technologyName(),
+                type.getSimpleName());
+          }
+        }
+      }
+
+      return ExecutionContext.getImplementorFactory().getDefaultImplementor();
+    } // close annotation manager
+  }
+
+  private void configureHousekeeping() {
+    logger.in();
+
+    this.housekeeper.initialize();
+
+    this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
+    this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
+    this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
+  }
   /*
    * ServletContextListener
    */
   @Override
   public void contextInitialized(final ServletContextEvent event) {
+    logger.in();
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      logger.in();
-
       try {
         Beans.setResourcesRoot(event.getServletContext().getRealPath("/WEB-INF"));
 
         listAttributes(event);
 
-        try (final AnnotationManager manager = new AnnotationManager()) {
-
-          final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
-
-          for (final String typename : files) {
-
-            final Class<?> type = Class.forName(typename);
-
-            if (type.isAnnotationPresent(GeneratorImplementor.class)) {
-
-              final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
-
-              logger.get().info("found id:{0} name:{1} default:{2} {3}",
-                  annotation.technologyId(),
-                  annotation.technologyName(),
-                  annotation.isDefault(),
-                  type.getSimpleName());
-
-              if (TechnologyProperties.class.isAssignableFrom(type)) {
-
-                final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
-
-                // set up properties from the annotations
-                technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
-
-                ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
-
-                // let the implementor know it's been registered
-                technologyImplementor.registerConfirmation();
-              }
-              else {
-                logger.get().warn("invalid id:{0} name:{1} {2}",
-                    annotation.technologyId(),
-                    annotation.technologyName(),
-                    type.getSimpleName());
-              }
-            }
-          }
-        } // close annotation manager
-
-        final LicenseGeneratorServiceInterface implementor = ExecutionContext.getImplementorFactory().getDefaultImplementor();
+        final LicenseGeneratorServiceInterface implementor = configureImplementors();
         if (implementor != null) {
-          logger.get().info("default implementor {0}", implementor.getClass().getName());
+          logger.get().debug("default implementor {0}", implementor.getClass().getName());
         }
         else {
-          logger.get().warn("no default implementor found");
+          logger.get().info("no default implementor found");
         }
 
-        this.housekeeper.initialize();
-
-        this.housekeeper.start(Timers.housekeeping, this::housekeeping, 1, ExecutionContext.getApplicationProperties().getHousekeepingFrequency(), TimeUnit.MINUTES);
-        this.housekeeper.start(Timers.logging, this::logging, 1, 1, TimeUnit.SECONDS);
-        this.housekeeper.start(Timers.polling, this::polling, 500, 500, TimeUnit.MILLISECONDS);
+        configureHousekeeping();
       }
       catch (final Throwable t) {
         logger.exception(t);
@@ -219,7 +227,6 @@ public class Application implements ServletContextListener {
         logger.yaml(Level.DEBUG, ExecutionContext.getApplicationData());
         logger.out();
       }
-
     }
   }
 

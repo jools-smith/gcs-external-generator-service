@@ -5,6 +5,8 @@ import com.revenera.gcs.utils.Constants;
 import com.revenera.gcs.utils.HandyBag;
 import com.revenera.gcs.utils.Serializer;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +23,7 @@ public class DiagnosticServlet extends HttpServlet {
   private static final LoggingFactory logger = LoggingFactory.create(DiagnosticServlet.class);
 
   enum Resources {
-    STATUS("/status"), HEALTH("/health"), START("/start"), SHUTDOWN("/shutdown"), INVALID("");
+    STATUS("/status"), HEALTH("/health"), INVALID("");
     private final String path;
 
     Resources(final String path) {
@@ -39,6 +41,10 @@ public class DiagnosticServlet extends HttpServlet {
     }
   }
 
+  public DiagnosticServlet() {
+    super();
+    logger.me(this);
+  }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -68,38 +74,47 @@ public class DiagnosticServlet extends HttpServlet {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    //noinspection unused
-    try (final ExecutionContext ctx = new ExecutionContext()) {
-      try {
-        logger.get().debug("Received POST request {0} {1}", req.getRequestURI(), req.getPathInfo());
-
-        resp.setContentType("application/json");
-
-        switch (Resources.fromPath(req.getPathInfo())) {
-          case START:
-            start(req, resp);
-            break;
-          case SHUTDOWN:
-            shutdown(req, resp);
-            break;
-          default:
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-      }
-      catch (Exception e) {
-        logger.exception(e);
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
-    }
+  public void destroy() {
+    logger.in();
+    super.destroy();
   }
 
-  private void getStatus(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
+  @Override
+  public void init(ServletConfig config) throws ServletException {
+    logger.in();
+    super.init(config);
+  }
+
+  @Override
+  public void init() throws ServletException {
+    logger.in();
+    super.init();
+  }
+
+  @Override
+  public String getServletName() {
+    return "Revenera GCS Diagnostic Servlet";
+  }
+
+  @Override
+  public String getServletInfo() {
+    return  "Revenera GCS Diagnostic Servlet v1.0";
+  }
+
+  @Override
+  protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    logger.in();
+    super.doTrace(req, resp);
+  }
+
+  /** IMPLEMENTORS **/
+
+  private void getHealth(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
     Serializer.serializeJsonIndented(resp.getWriter(), ExecutionContext.getApplicationProperties());
     resp.setStatus(HttpServletResponse.SC_OK);
   }
 
-  private void getHealth(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
+  private void getStatus(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
     final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     final ThreadMXBean threads = ManagementFactory.getThreadMXBean();
     final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();

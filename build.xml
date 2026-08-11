@@ -13,7 +13,7 @@
     <property name="generated" location="${BASE}/generated" />
     <property name="generated-src" location="${BASE}/generated/src" />
     <property name="schema-loc" location="${BASE}/schema" />
-    <property name="warfile" location="${BASE}/revenera-gcs##1.0.0.war" />
+    <property name="warfile" location="${BASE}/revenera-gcs.war" />
     <property name="zipped-sources" location="${BASE}/revenera-gcs.zip" />
     <property name="repository" location="${BASE}/repository" />
     <property name="build.props" location="build.properties" />
@@ -123,8 +123,22 @@ app.housekeeping=10
         <copy todir="${dist}/war/build/WEB-INF/wsdl/schema">
             <fileset dir="${schema-loc}" />
         </copy>
-        <jar jarfile="${warfile}" basedir="${dist}/war/build/" />
 
+        <!-- 1. Load the file you just built to access major/minor versions -->
+        <property file="${build}/revenera.properties" prefix="versioned"/>
+
+        <!-- 2. Construct the hacky Tomcat parallel deployment name string -->
+        <property name="versioned.warfile"
+                  location="${BASE}/revenera-gcs##${versioned.build.version.major}.${versioned.build.version.minor}.${versioned.build.number}.war" />
+
+        <!-- 3. Package the jar using the new versioned path property -->
+        <jar jarfile="${versioned.warfile}" basedir="${dist}/war/build/" />
+
+        <!-- 4. Keep a reference for the deploy step if needed -->
+        <property name="final.war.to.deploy" value="${versioned.warfile}"/>
+        <!--
+        <jar jarfile="${warfile}" basedir="${dist}/war/build/" />
+        -->
         <zip destfile="${zipped-sources}" basedir="${BASE}" />
     </target>
 

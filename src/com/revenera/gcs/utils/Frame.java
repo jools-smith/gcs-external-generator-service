@@ -3,6 +3,7 @@ package com.revenera.gcs.utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 @JsonPropertyOrder({
@@ -10,7 +11,7 @@ import com.revenera.gcs.logging.LoggingFactory;
     "methodName",
     "lineNumber"
 })
-public class Frame {
+public class Frame extends Loggable {
   public enum Depth {
     ZERO(0), ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7),;
 
@@ -20,7 +21,7 @@ public class Frame {
     }
   }
 
-  private static final LoggingFactory logger = LoggingFactory.create(Frame.class);
+//  private static final LoggingFactory logger = LoggingFactory.create(Frame.class);
 
   private final StackTraceElement frame;
 

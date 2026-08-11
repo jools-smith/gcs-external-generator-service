@@ -1,5 +1,6 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import java.util.HashMap;
@@ -9,8 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class Housekeeper {
-  private static final LoggingFactory logger = LoggingFactory.create(Housekeeper.class);
+public class  Housekeeper extends Loggable {
+//  private static final LoggingFactory logger = LoggingFactory.create(Housekeeper.class);
 
   private ScheduledExecutorService scheduler = null;
   private final Map<Object, ScheduledFuture<?>> runners = new HashMap<>();

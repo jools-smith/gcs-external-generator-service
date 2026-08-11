@@ -1,13 +1,14 @@
 package com.revenera.gcs.implementor;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ImplementorFactory implements ImplementorManagement {
-  private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
+public class ImplementorFactory extends Loggable implements ImplementorManagement {
+//  private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
 
   private final List<TechnologyProperties> implementors = new ArrayList<>();
 

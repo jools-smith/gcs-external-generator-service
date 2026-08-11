@@ -1,6 +1,7 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.implementor.ImplementorFactory;
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.logging.LoggingManager;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
@@ -27,7 +28,6 @@ public class Beans {
       implementorFactory = new ImplementorFactory();
       diagnosticsFactory = new DiagnosticsFactory();
       stopwatch.start();
-      logger.out();
     }
     finally {
       logger.get().info("Beans initialized...");

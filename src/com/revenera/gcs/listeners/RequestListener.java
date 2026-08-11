@@ -1,5 +1,6 @@
 package com.revenera.gcs.listeners;
 
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.ServletRequestEvent;
@@ -10,8 +11,7 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 @WebListener
-public class RequestListener implements ServletRequestListener {
-  private static final LoggingFactory logger = LoggingFactory.create(RequestListener.class);
+public class RequestListener extends Loggable implements ServletRequestListener {
 
   public RequestListener() {
     logger.me(this);

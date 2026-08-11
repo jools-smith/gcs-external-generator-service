@@ -1,5 +1,6 @@
 package com.revenera.gcs.listeners;
 
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.annotation.WebListener;
@@ -7,8 +8,7 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 @SuppressWarnings("unused")
 @WebListener
-public class SessionAttributeListener implements HttpSessionAttributeListener {
-  private static final LoggingFactory logger = LoggingFactory.create(SessionAttributeListener.class);
+public class SessionAttributeListener extends Loggable implements HttpSessionAttributeListener {
 
   public SessionAttributeListener() {
     logger.me(this);

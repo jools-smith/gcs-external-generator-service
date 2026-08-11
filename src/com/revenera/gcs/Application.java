@@ -4,7 +4,7 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
-import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.io.FileUtils;
 
@@ -12,7 +12,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -24,24 +23,19 @@ import java.util.concurrent.TimeUnit;
  * The root of the service, registered as a listener will set stuff up when the context is initialized
  */
 @WebListener
-public class Application implements ServletContextListener {
+public class Application extends Loggable implements ServletContextListener {
 
-  private static final LoggingFactory logger = LoggingFactory.create(Application.class);
+//  private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
   static {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      try {
-        final Level level = Level.valueOf(
-            ExecutionContext.getApplicationProperties().getLoggingLevel().toUpperCase());
+      final Level level = Level.valueOf(ExecutionContext
+          .getApplicationProperties()
+          .getLoggingLevel()
+          .toUpperCase());
 
-        ExecutionContext.getLoggingManager().setLevel(level);
-
-        logger.get().info("set logging level to {0}", level);
-      }
-      catch (final Throwable t) {
-        logger.exception(t);
-      }
+      ExecutionContext.getLoggingManager().setLevel(level);
     }
   }
 
@@ -54,7 +48,13 @@ public class Application implements ServletContextListener {
       logger.me(this);
 
       try {
-        logger.get().info("version", ExecutionContext.getApplicationProperties().getVersionDetails());
+        final ApplicationProperties props = ExecutionContext.getApplicationProperties();
+
+        logger.get().info("version {0} ({1}) {2} log-level {3}",
+            props.getVersion(),
+            props.getRelease(),
+            props.getTimestamp(),
+            ExecutionContext.getLoggingManager().getLevel());
       }
       catch (final Throwable t) {
         logger.exception(t);

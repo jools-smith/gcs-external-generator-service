@@ -1,5 +1,6 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import javax.servlet.*;
@@ -11,8 +12,8 @@ import java.util.Enumeration;
 
 @SuppressWarnings("unused")
 @WebFilter(urlPatterns = "/services/*")
-public class ApplicationRequestFilter implements Filter {
-  private static final LoggingFactory logger = LoggingFactory.create(ApplicationRequestFilter.class);
+public class ApplicationRequestFilter extends Loggable implements Filter {
+//  private static final LoggingFactory logger = LoggingFactory.create(ApplicationRequestFilter.class);
   
   public ApplicationRequestFilter() {
     logger.me(this);

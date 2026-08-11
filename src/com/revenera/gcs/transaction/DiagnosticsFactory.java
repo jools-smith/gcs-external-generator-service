@@ -1,5 +1,6 @@
 package com.revenera.gcs.transaction;
 
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.utils.Frame;
 
@@ -8,8 +9,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class DiagnosticsFactory implements TransactionManagement, ExecutionManagement {
-  private static final LoggingFactory logger = LoggingFactory.create(DiagnosticsFactory.class);
+public class DiagnosticsFactory extends Loggable implements TransactionManagement, ExecutionManagement {
+//  private static final LoggingFactory logger = LoggingFactory.create(DiagnosticsFactory.class);
 
   private final List<ExecutionRecord> records = new LinkedList<>();
 

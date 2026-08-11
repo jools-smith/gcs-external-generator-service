@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public abstract class AbstractGenerator extends AbstractTechnology {
 
-  protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
+//  protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
 
   @SuppressWarnings("SameParameterValue")
   protected List<LicenseFileMapItem> makeLicenseFiles(final List<LicenseFileDefinition> files, final String text, final byte[] bytes) {

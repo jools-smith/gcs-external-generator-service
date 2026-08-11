@@ -1,6 +1,7 @@
 package com.revenera.gcs;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.logging.LoggingFactory;
 
 import java.io.IOException;
@@ -21,8 +22,8 @@ import java.util.stream.Stream;
     "versionDetails",
     "hash"
 })
-public final class ApplicationProperties {
-  private static final LoggingFactory logger = LoggingFactory.create(ApplicationProperties.class);
+public final class ApplicationProperties extends Loggable {
+//  private static final LoggingFactory logger = LoggingFactory.create(ApplicationProperties.class);
 
   enum Items {
     TIMESTAMP("build.timestamp"),
@@ -68,8 +69,7 @@ public final class ApplicationProperties {
   public String getVersion() {
     return Stream.of(this.properties.get(Items.VERSION_MAJOR),
         this.properties.get(Items.VERSION_MINOR),
-        this.properties.get(Items.BUILD_NUMBER),
-        this.properties.get(Items.RELEASE))
+        this.properties.get(Items.BUILD_NUMBER))
         .map(Object::toString)
         .collect(Collectors.joining("."));
   }

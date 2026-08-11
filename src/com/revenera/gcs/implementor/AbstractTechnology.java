@@ -1,6 +1,8 @@
 package com.revenera.gcs.implementor;
 
-abstract class AbstractTechnology implements TechnologyProperties {
+import com.revenera.gcs.logging.Loggable;
+
+abstract class AbstractTechnology extends Loggable implements TechnologyProperties {
   protected String name;
   protected String id;
 

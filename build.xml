@@ -76,11 +76,13 @@
     <target name="compile"
             depends="wsdl2src, init-buildnumber"
             description="compile the source ">
+
         <javac srcdir="${generated-src}"
                destdir="${build}"
                includeantruntime="false"
                debug="true"
                encoding="utf-8" />
+
         <javac srcdir="${src}"
                destdir="${build}"
                includeantruntime="false"
@@ -114,12 +116,15 @@ app.housekeeping=10
             depends="compile"
             description="generate the distribution war">
         <mkdir dir="${dist}/war" />
+
         <copy todir="${dist}/war/build/WEB-INF/">
             <fileset dir="${webcontent}/WEB-INF/" />
         </copy>
+
         <copy todir="${dist}/war/build/WEB-INF/classes/">
             <fileset dir="${build}" />
         </copy>
+
         <copy todir="${dist}/war/build/WEB-INF/wsdl/schema">
             <fileset dir="${schema-loc}" />
         </copy>
@@ -136,14 +141,16 @@ app.housekeeping=10
 
         <!-- 4. Keep a reference for the deploy step if needed -->
         <property name="final.war.to.deploy" value="${versioned.warfile}"/>
+
         <!--
         <jar jarfile="${warfile}" basedir="${dist}/war/build/" />
-        -->
         <zip destfile="${zipped-sources}" basedir="${BASE}" />
+        -->
+
     </target>
 
     <target name="deploy" depends="build">
-        <copy todir="${repository}" file="${warfile}" />
+        <move todir="${repository}" file="${final.war.to.deploy}" />
         <echo message="" />
         <echo message="http://server:port/revenera-gcs/services/LicenseGeneratorService" />
     </target>

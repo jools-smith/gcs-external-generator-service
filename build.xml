@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <project name="ExtGenSvc" default="build" basedir=".">
     <description>
         Web Services build file
@@ -5,19 +7,40 @@
 
     <property environment="env" />
 
+    <!--
     <property name="BASE" location="." />
-    <property name="src" location="${BASE}/src" />
-    <property name="build" location="${BASE}/build" />
-    <property name="dist" location="${BASE}/dist" />
-    <property name="webcontent" location="${BASE}/WebContent" />
-    <property name="generated" location="${BASE}/generated" />
-    <property name="generated-src" location="${BASE}/generated/src" />
-    <property name="schema-loc" location="${BASE}/schema" />
-    <property name="warfile" location="${BASE}/revenera-gcs.war" />
-    <property name="zipped-sources" location="${BASE}/revenera-gcs.zip" />
-    <property name="repository" location="${BASE}/repository" />
+    -->
+    <property name="src" location="${basedir}/src" />
+    <property name="build" location="${basedir}/build" />
+    <property name="dist" location="${basedir}/dist" />
+    <property name="webcontent" location="${basedir}/WebContent" />
+    <property name="generated" location="${basedir}/generated" />
+    <property name="generated-src" location="${basedir}/generated/src" />
+    <property name="schema-loc" location="${basedir}/schema" />
+    <property name="warfile" location="${basedir}/revenera-gcs.war" />
+    <property name="zipped-sources" location="${basedir}/revenera-gcs.zip" />
+    <property name="repository" location="${basedir}/repository" />
+
     <property name="build.props" location="build.properties" />
 
+    <path id="licservice.classpath">
+        <fileset dir="${basedir}/WebContent/WEB-INF/lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <!-- CLEAN -->
+    <target name="clean" description="clean up">
+        <delete file="${warfile}" />
+        <delete file="${zipped-sources}" />
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <delete dir="${generated-src}" />
+        <delete dir="${generated}" />
+        <delete dir="${repository}" />
+    </target>
+
+    <!-- INIT-BUILDNUMBER -->
     <target name="init-buildnumber">
         <!-- If file doesn't exist, create it with build.number=0 -->
         <touch file="${build.props}" />
@@ -41,30 +64,28 @@
         <property file="${build.props}" />
     </target>
 
-    <path id="licservice.classpath">
-        <fileset dir="${BASE}/WebContent/WEB-INF/lib">
-            <include name="**/*.jar" />
-        </fileset>
-    </path>
-
+    <!-- INIT -->
     <target name="init" depends="clean">
-        <tstamp />
-        <mkdir dir="${build}" />
-        <mkdir dir="${generated-src}" />
+        <echo message="Using ANT version ${ant.java.version}"/>
+        <echo message="Building in ${basedir}"/>
+        <tstamp/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${generated-src}"/>
     </target>
 
+    <!-- WSDL2SRC -->
     <target name="wsdl2src" depends="init" description="generate source from wsdl">
         <taskdef name="jaxws"
                  classname="com.sun.tools.ws.ant.WsImport"
                  classpathref="licservice.classpath" />
 
-        <jaxws wsdl="${BASE}/schema/LicenseGeneratorService.wsdl"
+        <jaxws wsdl="${basedir}/schema/LicenseGeneratorService.wsdl"
                sourcedestdir="${generated-src}"
                keep="true"
-               binding="${BASE}/schema/common-types.xml"
+               binding="${basedir}/schema/common-types.xml"
                xnocompile="true">
 
-            <depends file="${BASE}/schema/LicenseGeneratorService.wsdl" />
+            <depends file="${basedir}/schema/LicenseGeneratorService.wsdl" />
 
             <produces dir="${generated-src}/com/flexnet/external/webservice/keygenerator" />
 
@@ -73,6 +94,7 @@
 
     </target>
 
+    <!-- COMPILE -->
     <target name="compile"
             depends="wsdl2src, init-buildnumber"
             description="compile the source ">
@@ -98,8 +120,8 @@
 
         <!-- this copy works -->
         <echo file="${build}/revenera.properties">
-build.version.major=3
-build.version.minor=1
+build.version.major=4
+build.version.minor=0
 build.number=${build.number}
 build.timestamp=${build.timestamp}
 build.date=${build.date}
@@ -112,6 +134,8 @@ app.housekeeping=10
         </echo>
     </target>
 
+
+    <!-- BUILD -->
     <target name="build"
             depends="compile"
             description="generate the distribution war">
@@ -134,7 +158,7 @@ app.housekeeping=10
 
         <!-- 2. Construct the hacky Tomcat parallel deployment name string -->
         <property name="versioned.warfile"
-                  location="${BASE}/revenera-gcs##${versioned.build.version.major}.${versioned.build.version.minor}.${versioned.build.number}.war" />
+                  location="${basedir}/revenera-gcs##${versioned.build.version.major}.${versioned.build.version.minor}.${versioned.build.number}.war" />
 
         <!-- 3. Package the jar using the new versioned path property -->
         <jar jarfile="${versioned.warfile}" basedir="${dist}/war/build/" />
@@ -142,26 +166,13 @@ app.housekeeping=10
         <!-- 4. Keep a reference for the deploy step if needed -->
         <property name="final.war.to.deploy" value="${versioned.warfile}"/>
 
-        <!--
-        <jar jarfile="${warfile}" basedir="${dist}/war/build/" />
-        <zip destfile="${zipped-sources}" basedir="${BASE}" />
-        -->
-
     </target>
 
+    <!-- DEPLOY -->
     <target name="deploy" depends="build">
         <move todir="${repository}" file="${final.war.to.deploy}" />
         <echo message="" />
         <echo message="http://server:port/revenera-gcs/services/LicenseGeneratorService" />
     </target>
 
-    <target name="clean" description="clean up">
-        <delete file="${warfile}" />
-        <delete file="${zipped-sources}" />
-        <delete dir="${build}" />
-        <delete dir="${dist}" />
-        <delete dir="${generated-src}" />
-        <delete dir="${generated}" />
-        <delete dir="${repository}" />
-    </target>
 </project>

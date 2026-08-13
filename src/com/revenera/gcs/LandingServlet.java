@@ -1,0 +1,177 @@
+package com.revenera.gcs;
+
+import com.revenera.gcs.utils.Serializer;
+import org.apache.commons.lang3.SystemUtils;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.MessageFormat;
+
+@WebServlet("/")
+public class LandingServlet extends HttpServlet {
+
+  private static final String css =
+      "body {\n" +
+      "    margin: 0;\n" +
+      "    font-family: \"Segoe UI\", Arial, sans-serif;\n" +
+      "    background-color: #f4f6f8;\n" +
+      "    color: #333;\n" +
+      "}\n" +
+      ".banner {\n" +
+      "    background-color: #003366;\n" +
+      "    color: white;\n" +
+      "    padding: 30px 40px;\n" +
+      "}\n" +
+      ".banner h1 {\n" +
+      "    margin: 0;\n" +
+      "    font-size: 32px;\n" +
+      "    font-weight: 500;\n" +
+      "}\n" +
+      ".banner p {\n" +
+      "    margin: 8px 0 0 0;\n" +
+      "    opacity: 0.9;\n" +
+      "}\n" +
+      ".container {\n" +
+      "    max-width: 900px;\n" +
+      "    margin: 40px auto;\n" +
+      "    padding: 0 20px;\n" +
+      "}\n" +
+      ".card {\n" +
+      "    background: white;\n" +
+      "    border-radius: 8px;\n" +
+      "    box-shadow: 0 2px 10px rgba(0,0,0,0.08);\n" +
+      "    padding: 30px;\n" +
+      "}\n" +
+      ".card h2 {\n" +
+      "    margin-top: 0;\n" +
+      "    color: #003366;\n" +
+      "}\n" +
+      "table {\n" +
+      "    width: 100%;\n" +
+      "    border-collapse: collapse;\n" +
+      "    margin-top: 20px;\n" +
+      "}\n" +
+      "th, td {\n" +
+      "    padding: 12px;\n" +
+      "    text-align: left;\n" +
+      "    border-bottom: 1px solid #e0e0e0;\n" +
+      "}\n" +
+      "th {\n" +
+      "    width: 220px;\n" +
+      "    color: #555;\n" +
+      "    background-color: #fafafa;\n" +
+      "}\n" +
+      ".status {\n" +
+      "    display: inline-block;\n" +
+      "    padding: 4px 12px;\n" +
+      "    background-color: #dff0d8;\n" +
+      "    color: #3c763d;\n" +
+      "    border-radius: 12px;\n" +
+      "    font-size: 0.9em;\n" +
+      "}\n" +
+      ".footer {\n" +
+      "    text-align: center;\n" +
+      "    margin-top: 30px;\n" +
+      "    color: #777;\n" +
+      "    font-size: 0.85em;\n" +
+      "}\n";
+
+  private static final String page = "<!DOCTYPE html>\n" +
+      "<html lang=\"en\">\n" +
+      "<head>\n" +
+      "<meta charset=\"UTF-8\">\n" +
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+      "<title>TSS Licence Management Service</title>\n" +
+      "<style>{9}</style>\n" +
+      "</head>\n" +
+      "<body>\n" +
+      "<div class=\"banner\">\n" +
+      "    <h1>Revenera GCS Remote Licence Generation Service</h1>\n" +
+      "    <p>FlexNet Operations&reg; Administration and Monitoring</p>\n" +
+      "</div>\n" +
+      "<div class=\"container\">\n" +
+      "    <div class=\"card\">\n" +
+      "        <h2>Application Information</h2>\n" +
+      "        <table>\n" +
+      "            <tr>\n" +
+      "                <th>Application</th>\n" +
+      "                <td>Revenera Licence Generation Service</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Version</th>\n" +
+      "                <td>{0}.{1}</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Release Date</th>\n" +
+      "                <td>{2} {3}</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Build Number</th>\n" +
+      "                <td>{4}</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Environment</th>\n" +
+      "                <td>{5} {6} {7}</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Status</th>\n" +
+      "                <td><span class=\"status\">Running</span></td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Java Runtime</th>\n" +
+      "                <td>{8}</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Application Server</th>\n" +
+      "                <td>Apache Tomcat</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Support Team</th>\n" +
+      "                <td>Revenera Support</td>\n" +
+      "            </tr>\n" +
+      "            <tr>\n" +
+      "                <th>Diagnostics</th>\n" +
+      "                <td>{10}</td>\n" +
+      "            </tr>\n" +
+      "        </table>\n" +
+      "        <p style=\"margin-top:30px\">\n" +
+      "            This application provides licence generation facilities for multiple license technologies.\n" +
+      "        </p>\n" +
+      "    </div>\n" +
+      "    <div class=\"footer\">\n" +
+      "        &copy; 2026 Revenera GCS\n" +
+      "    </div>\n" +
+      "</div></body></html>";
+
+  @Override
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+
+    try (final ExecutionContext ctx = new ExecutionContext()) {
+
+      final ApplicationProperties props = ExecutionContext.getApplicationProperties();
+
+      final String html = MessageFormat.format(page,
+
+          props.getVersionMajor(), props.getVersionMinor(),
+
+          props.getReleaseDate(), props.getReleaseTime(),
+
+          props.getBuildNumber(),
+
+          SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH,
+
+          SystemUtils.JAVA_VERSION,
+
+          css,
+
+          Serializer.safeSerializeYaml(ExecutionContext.getApplicationData()));
+
+      resp.getWriter().println(html);
+
+      resp.setStatus(HttpServletResponse.SC_OK);
+    }
+  }
+}

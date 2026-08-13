@@ -76,15 +76,25 @@ public final class ApplicationProperties extends Loggable {
         .collect(Collectors.joining("."));
   }
 
-  public String getDate() {
+  public String getVersionMajor() {
+    return this.properties.get(Items.VERSION_MAJOR).toString();
+  }
+
+  public String getVersionMinor() {
+    return this.properties.get(Items.VERSION_MINOR).toString();
+  }
+
+  public String getBuildNumber() {
+    return this.properties.get(Items.BUILD_NUMBER).toString();
+  }
+
+  public String getReleaseDate() {
     return this.properties.get(Items.DATE).toString();
   }
 
-  public String getTime() {
+  public String getReleaseTime() {
     return this.properties.get(Items.TIME).toString();
   }
-
-
 
   public int getHousekeepingFrequency() {
     return Integer.parseInt(this.properties.get(Items.HOUSEKEEPING_INTERVAL).toString());

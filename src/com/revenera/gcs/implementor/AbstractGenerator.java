@@ -56,8 +56,8 @@ public abstract class AbstractGenerator extends AbstractTechnology {
                 technologyId())
             .withJoined("version",
                 ExecutionContext.getApplicationProperties().getVersion(),
-                ExecutionContext.getApplicationProperties().getDate(),
-                ExecutionContext.getApplicationProperties().getTime())
+                ExecutionContext.getApplicationProperties().getReleaseDate(),
+                ExecutionContext.getApplicationProperties().getReleaseTime())
             .withJoined("system",
                 SystemProperties.getOsName(),
                 SystemProperties.getOsVersion(),

@@ -6,4 +6,8 @@ public interface LoggingManagement {
   void setLevel(Level level);
 
   Level getLevel();
+
+  void setEcho(boolean echo);
+
+  boolean willEcho();
 }

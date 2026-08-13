@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LoggingFactory {
   static final DateTimeFormatter tomcat_formatter = DateTimeFormatter
@@ -58,18 +57,15 @@ public class LoggingFactory {
     }
 
     private void post(final Level level, final String message) {
-      //noinspection unused
-//      try (final ExecutionContext ctx = new ExecutionContext(false)) {
-        synchronized (lock) {
+      synchronized (lock) {
+        if (ExecutionContext.getLoggingManager().willLog(level)) {
           final String logMessage = formatLogMessage(level, tomcat_formatter, message);
 
           System.out.println(logMessage);
 
-          if (ExecutionContext.getLoggingManager().willLog(level)) {
-            ExecutionContext.getLoggingManager().postMessage(logMessage);
-          }
+          ExecutionContext.getLoggingManager().postMessage(logMessage);
         }
-//      }
+      }
     }
 
     @Override
@@ -95,11 +91,6 @@ public class LoggingFactory {
           frame.getMethodName(),
           frame.getLineNumber());
     }
-
-//    @Override
-//    public void array(Level level, String caption, Object... params) {
-//      log(level, "{0} | {1}", caption, Stream.of(params).map(Object::toString).collect(Collectors.joining("|")));
-//    }
   }
 
   final Class<?> type;

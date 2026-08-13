@@ -32,8 +32,6 @@ public interface Logging {
 
   void exception(Throwable t);
 
-//  void array(Level level, String caption, Object...params);
-
   void log(Level level, String format, Object...params);
   @SuppressWarnings("unused")
   default void all(String format, Object... params) {

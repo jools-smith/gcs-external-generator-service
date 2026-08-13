@@ -1,6 +1,8 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.utils.Serializer;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -9,15 +11,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 @WebServlet("/control/*")
 public class ControlServlet extends HttpServlet {
   private static final LoggingFactory logger = LoggingFactory.create(ControlServlet.class);
 
   enum Resources {
-    STATUS("/status"), HEALTH("/health"), START("/start"), INJECT("/inject"), INVALID("");
+    STATUS("/status"), LOGGING_LEVEL("/logging/level"), LOGGING_ECHO("/logging/echo"), INVALID("");
     private final String path;
 
     Resources(final String path) {
@@ -53,8 +55,11 @@ public class ControlServlet extends HttpServlet {
           case STATUS:
             getStatus(req, resp);
             break;
-          case HEALTH:
-            getHealth(req, resp);
+          case LOGGING_ECHO:
+            getLoggingEcho(req, resp);
+            break;
+          case LOGGING_LEVEL:
+            getLoggingLevel(req, resp);
             break;
           default:
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -77,11 +82,11 @@ public class ControlServlet extends HttpServlet {
         resp.setContentType("application/json");
 
         switch (Resources.fromPath(req.getPathInfo())) {
-          case START:
-            start(req, resp);
+          case LOGGING_ECHO:
+            postLoggingEcho(req, resp);
             break;
-          case INJECT:
-            inject(req, resp);
+          case LOGGING_LEVEL:
+            postLoggingLevel(req, resp);
             break;
           default:
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -126,41 +131,53 @@ public class ControlServlet extends HttpServlet {
    * IMPLEMENTOR METHODS
    **/
 
-  enum InjectTypes {
-    ECHO("log-echo"), LEVEL("log-level");
-    final String value;
 
-    InjectTypes(final String value) {
-      this.value = value;
-    }
-  }
-  private void getStatus(final HttpServletRequest ignored, final HttpServletResponse resp) {
+  private void getStatus(final HttpServletRequest ignored, final HttpServletResponse resp) throws IOException {
+    Serializer.serializeJsonIndented(resp.getWriter(), new HashMap<String, Object>() {
+      {
+        put("status", "OK");
+        put("level", ExecutionContext.getLoggingManager().getLevel());
+        put("echo", ExecutionContext.getLoggingManager().willEcho());
+      }
+    });
     resp.setStatus(HttpServletResponse.SC_OK);
   }
 
-  private void getHealth(final HttpServletRequest ignored, final HttpServletResponse resp) {
+
+  private void getLoggingLevel(final HttpServletRequest request, final HttpServletResponse resp) throws IOException {
+    Serializer.serializeJsonIndented(resp.getWriter(),
+        new AbstractMap.SimpleEntry<>("level", ExecutionContext.getLoggingManager().getLevel()));
     resp.setStatus(HttpServletResponse.SC_OK);
   }
 
-  private void start(final HttpServletRequest ignored, final HttpServletResponse resp) {
+  private void getLoggingEcho(final HttpServletRequest request, final HttpServletResponse resp) throws IOException {
+    Serializer.serializeJsonIndented(resp.getWriter(),
+        new AbstractMap.SimpleEntry<>("echo", ExecutionContext.getLoggingManager().getLevel()));
     resp.setStatus(HttpServletResponse.SC_OK);
   }
 
-  private void inject(final HttpServletRequest request, final HttpServletResponse resp) {
+  private void postLoggingLevel(final HttpServletRequest request, final HttpServletResponse resp) throws IOException {
 
-    final Map<String, String[]> map = request.getParameterMap();
+    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-    map.forEach((key, value) ->
-        logger.get().info("injecting parameter " + key + ": " + Arrays.toString(value)));
+    Stream.of(request.getParameterMap().get("level")).findFirst().ifPresent(level -> {
+      ExecutionContext.getLoggingManager().setLevel(Level.valueOf(level));
 
-    if (map.containsKey(InjectTypes.ECHO.value)) {
-      //TODO:fix this
-    }
+      resp.setStatus(HttpServletResponse.SC_OK);
+    });
 
-    if (map.containsKey(InjectTypes.LEVEL.value)) {
-      //TODO:fix this
-    }
+    getLoggingLevel(request, resp);
+  }
 
-    resp.setStatus(HttpServletResponse.SC_OK);
+  private void postLoggingEcho(final HttpServletRequest request, final HttpServletResponse resp) throws IOException {
+    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+    Stream.of(request.getParameterMap().get("echo")).findFirst().ifPresent(echo -> {
+      ExecutionContext.getLoggingManager().setEcho(Boolean.parseBoolean(echo));
+
+      resp.setStatus(HttpServletResponse.SC_OK);
+    });
+
+    getLoggingEcho(request, resp);
   }
 }

@@ -16,19 +16,20 @@ import java.time.Instant;
 })
 public class ExecutionRecord {
   private final String method;
+  private final int line;
   private Duration duration;
   private long count;
   private Instant updated;
 
   private static String makeKey(final Frame element) {
-    return String.format("%s.%s(%d)",
+    return String.format("%s.%s",
         element.getSimpleClassName(),
-        element.getMethodName(),
-        element.getLineNumber());
+        element.getMethodName());
   }
 
   ExecutionRecord(final Frame element) {
     this.method = makeKey(element);
+    this.line = element.getLineNumber();
     this.duration = Duration.ZERO;
     this.count = 0;
     this.updated = Instant.now();
@@ -54,6 +55,10 @@ public class ExecutionRecord {
 
   public String getMethod() {
     return this.method;
+  }
+
+  public int getLine() {
+    return this.line;
   }
 
   public double getTotalDuration() {

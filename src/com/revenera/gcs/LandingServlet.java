@@ -1,5 +1,7 @@
 package com.revenera.gcs;
 
+import com.revenera.gcs.logging.LoggingFactory;
+import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -9,10 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @WebServlet("/")
 public class LandingServlet extends HttpServlet {
-
+  private static final LoggingFactory logger = LoggingFactory.create(LandingServlet.class);
   private static final String css =
       "body {\n" +
       "    margin: 0;\n" +
@@ -134,7 +138,10 @@ public class LandingServlet extends HttpServlet {
       "            </tr>\n" +
       "            <tr>\n" +
       "                <th>Diagnostics</th>\n" +
-      "                <td>{10}</td>\n" +
+      "                <table>\n" +
+      "                   <tr><th>Method</th><th>Count</th><th>Sojourn</th><th>Mean</th></tr>\n" +
+      "{10}\n" +
+      "                </table>\n" +
       "            </tr>\n" +
       "        </table>\n" +
       "        <p style=\"margin-top:30px\">\n" +
@@ -146,12 +153,37 @@ public class LandingServlet extends HttpServlet {
       "    </div>\n" +
       "</div></body></html>";
 
+  public LandingServlet() {
+    super();
+    logger.me(this);
+  }
+
+  private static String escape(final String text) {
+    return text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;");
+  }
+
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+
+    logger.in();
 
     try (final ExecutionContext ctx = new ExecutionContext()) {
 
       final ApplicationProperties props = ExecutionContext.getApplicationProperties();
+
+
+      final String diag = ExecutionContext.getExecutionManager().getRecords().stream()
+          .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
+          .map(x ->
+              String.format("<tr><td>%s</td><td>%d</td><td>%f</td><td>%f</td></tr>",
+                  escape(x.getMethod()),
+                  x.getCount(),
+                  x.getTotalDuration(),
+                  x.getMeanLatency()))
+          .collect(Collectors.joining("\n"));
 
       final String html = MessageFormat.format(page,
 
@@ -167,11 +199,15 @@ public class LandingServlet extends HttpServlet {
 
           css,
 
-          Serializer.safeSerializeYaml(ExecutionContext.getApplicationData()));
+          diag
+      );
 
       resp.getWriter().println(html);
 
       resp.setStatus(HttpServletResponse.SC_OK);
+    }
+    finally {
+      logger.out();
     }
   }
 }

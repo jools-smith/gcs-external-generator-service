@@ -30,12 +30,14 @@ public class Application extends Loggable implements ServletContextListener {
   static {
     //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
-      final Level level = Level.valueOf(ExecutionContext
+      ExecutionContext.getLoggingManager().setLevel(Level.valueOf(ExecutionContext
           .getApplicationProperties()
           .getLoggingLevel()
-          .toUpperCase());
+          .toUpperCase()));
 
-      ExecutionContext.getLoggingManager().setLevel(level);
+      ExecutionContext.getLoggingManager().setEcho(ExecutionContext
+          .getApplicationProperties()
+          .getLoggingEcho());
     }
   }
 
@@ -65,7 +67,7 @@ public class Application extends Loggable implements ServletContextListener {
   private void serializeToLogPath(final String filename, final List<String> content) throws IOException {
     //noinspection unused
 
-    if (ExecutionContext.getApplicationProperties().getLoggingEcho()) {
+    if (ExecutionContext.getLoggingManager().willEcho()) {
       final String root = ExecutionContext.getLogPath().toRealPath().toString();
 
       if (Files.exists(Paths.get(root))) {

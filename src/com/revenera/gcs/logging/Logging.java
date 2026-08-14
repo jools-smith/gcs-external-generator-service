@@ -3,7 +3,7 @@ package com.revenera.gcs.logging;
 public interface Logging {
   @SuppressWarnings("unused")
   default void all(String message) {
-    log(Level.ALL, "{0}", message);
+    log(Level.NONE, "{0}", message);
   }
   @SuppressWarnings("unused")
   default void error(String message) {
@@ -35,7 +35,7 @@ public interface Logging {
   void log(Level level, String format, Object...params);
   @SuppressWarnings("unused")
   default void all(String format, Object... params) {
-    log(Level.ALL, format, params);
+    log(Level.NONE, format, params);
   }
 
   default void error(String format, Object... params) {

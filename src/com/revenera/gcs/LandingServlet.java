@@ -88,8 +88,8 @@ public class LandingServlet extends HttpServlet {
       "<head>\n" +
       "<meta charset=\"UTF-8\">\n" +
       "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-      "<title>TSS Licence Management Service</title>\n" +
-      "<style>{9}</style>\n" +
+      "<title>Revenera GCS Remote Licence Generation Service</title>\n" +
+      "<style>{0}</style>\n" +
       "</head>\n" +
       "<body>\n" +
       "<div class=\"banner\">\n" +
@@ -100,48 +100,19 @@ public class LandingServlet extends HttpServlet {
       "    <div class=\"card\">\n" +
       "        <h2>Application Information</h2>\n" +
       "        <table>\n" +
-      "            <tr>\n" +
-      "                <th>Application</th>\n" +
-      "                <td>Revenera Licence Generation Service</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Version</th>\n" +
-      "                <td>{0}.{1}</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Release Date</th>\n" +
-      "                <td>{2} {3}</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Build Number</th>\n" +
-      "                <td>{4}</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Environment</th>\n" +
-      "                <td>{5} {6} {7}</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Status</th>\n" +
-      "                <td><span class=\"status\">Running</span></td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Java Runtime</th>\n" +
-      "                <td>{8}</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Application Server</th>\n" +
-      "                <td>Apache Tomcat</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Support Team</th>\n" +
-      "                <td>Revenera Support</td>\n" +
-      "            </tr>\n" +
-      "            <tr>\n" +
-      "                <th>Diagnostics</th>\n" +
+      "            <tr><th>Application</th><td>Revenera Licence Generation Service</td></tr>\n" +
+      "            <tr><th>Version</th><td>{1}.{2}</td></tr>\n" +
+      "            <tr><th>Release Date</th><td>{3} &nbsp;{4}</td></tr>\n" +
+      "            <tr><th>Build Number</th><td>{5}</td></tr>\n" +
+      "            <tr><th>Environment</th><td>{6} &nbsp;({7} &nbsp;{8})</td></tr>\n" +
+      "            <tr><th>Status</th><td><spanclass=\"status\">{9} &nbsp;{10}</span></td></tr>\n" +
+      "            <tr><th>Java Runtime</th><td>{11} &nbsp;{12} &nbsp;({13})</td></tr>\n" +
+      "            <tr><th>Technologies</th><td>{14}</td></tr>\n" +
+      "            <tr><th>Diagnostics</th>\n"+
       "                <table>\n" +
-      "                   <tr><th>Method</th><th>Count</th><th>Sojourn</th><th>Mean</th></tr>\n" +
-      "{10}\n" +
-      "                </table>\n" +
+      "                    <tr><th>Method</th><th>Count</th><th>Sojourn (secs)</th><th>Mean (secs)</th></tr>\n" +
+      "                    {15}\n" +
+      "                 </table>\n" +
       "            </tr>\n" +
       "        </table>\n" +
       "        <p style=\"margin-top:30px\">\n" +
@@ -149,7 +120,7 @@ public class LandingServlet extends HttpServlet {
       "        </p>\n" +
       "    </div>\n" +
       "    <div class=\"footer\">\n" +
-      "        &copy; 2026 Revenera GCS\n" +
+      "        &copy; 2026 Revenera GCS. All rights reserved.\n" +
       "    </div>\n" +
       "</div></body></html>";
 
@@ -168,12 +139,9 @@ public class LandingServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 
-    logger.in();
-
     try (final ExecutionContext ctx = new ExecutionContext()) {
 
       final ApplicationProperties props = ExecutionContext.getApplicationProperties();
-
 
       final String diag = ExecutionContext.getExecutionManager().getRecords().stream()
           .sorted(Comparator.comparing(ExecutionRecord::getUpdated).reversed())
@@ -186,6 +154,7 @@ public class LandingServlet extends HttpServlet {
           .collect(Collectors.joining("\n"));
 
       final String html = MessageFormat.format(page,
+          css,
 
           props.getVersionMajor(), props.getVersionMinor(),
 
@@ -195,9 +164,11 @@ public class LandingServlet extends HttpServlet {
 
           SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH,
 
-          SystemUtils.JAVA_VERSION,
+          SystemUtils.getHostName(), ExecutionContext.getApplicationDuration().toString(),
 
-          css,
+          SystemUtils.JAVA_VM_NAME, SystemUtils.JAVA_VERSION, SystemUtils.JAVA_CLASS_VERSION,
+
+          String.join("&nbsp;&nbsp;&nbsp;", ExecutionContext.getImplementorFactory().getImplementors()),
 
           diag
       );
@@ -205,9 +176,6 @@ public class LandingServlet extends HttpServlet {
       resp.getWriter().println(html);
 
       resp.setStatus(HttpServletResponse.SC_OK);
-    }
-    finally {
-      logger.out();
     }
   }
 }

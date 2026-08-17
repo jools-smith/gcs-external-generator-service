@@ -1,8 +1,9 @@
-package com.revenera.gcs;
+package com.revenera.gcs.servlets;
 
+import com.revenera.gcs.ApplicationProperties;
+import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionRecord;
-import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.SystemUtils;
 
 import javax.servlet.annotation.WebServlet;
@@ -138,7 +139,7 @@ public class LandingServlet extends HttpServlet {
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-
+    //noinspection unused
     try (final ExecutionContext ctx = new ExecutionContext()) {
 
       final ApplicationProperties props = ExecutionContext.getApplicationProperties();

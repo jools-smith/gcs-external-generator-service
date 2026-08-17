@@ -1,16 +1,22 @@
-package com.flexnet.external.webservice.keygenerator;
+package com.revenera.gcs.webservices;
 
 import com.flexnet.external.type.*;
+import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
+import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.ExecutionContext;
+import com.revenera.gcs.implementor.ServiceImplementor;
+import com.revenera.gcs.logging.Loggable;
 
 import javax.jws.WebService;
+
 
 @WebService(
     serviceName = "revenera-gcs",
     endpointInterface = "com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface",
     wsdlLocation = "WEB-INF/wsdl/schema/LicenseGeneratorService.wsdl"
 )
-public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseGeneratorServiceInterface {
+@ServiceImplementor(serviceName = "LicenseGeneratorService")
+public class LicenseGeneratorServiceImpl extends Loggable implements LicenseGeneratorServiceInterface {
 
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
@@ -25,7 +31,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -43,7 +49,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -60,7 +66,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -78,7 +84,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -95,7 +101,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -112,7 +118,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -131,7 +137,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }
@@ -148,7 +154,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
       }
       catch (final Throwable t) {
         logger.exception(t);
-        throw new LicGeneratorException(t.getMessage(), ServiceHelper.makeServiceException(t));
+        return ServiceHelper.raiseLicGeneratorException(t);
       }
     }
   }

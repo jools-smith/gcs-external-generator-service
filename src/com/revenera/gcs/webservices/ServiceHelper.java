@@ -1,6 +1,7 @@
-package com.flexnet.external.webservice.keygenerator;
+package com.revenera.gcs.webservices;
 
 import com.flexnet.external.type.*;
+import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -13,14 +14,15 @@ public class ServiceHelper {
         String.valueOf(frame.getLineNumber()));
   }
   
-  public static SvcException makeServiceException(final Throwable throwable) {
+  public static <T> T raiseLicGeneratorException(final Throwable throwable) throws LicGeneratorException {
     final StackTraceElement frame = Thread.currentThread().getStackTrace()[2];
 
-    final SvcException sex = new SvcException();
-    sex.setMessage(getStackTraceElement(frame));
-    sex.setName(throwable.getClass().getSimpleName());
-
-    return sex;
+    throw new LicGeneratorException(throwable.getMessage(), new SvcException() {
+      {
+        setMessage(getStackTraceElement(frame));
+        setName(throwable.getClass().getSimpleName());
+      }
+    });
   }
 
   public static String getLicenseTechnology(final Object obj) {

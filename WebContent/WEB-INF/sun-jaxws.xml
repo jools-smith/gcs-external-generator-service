@@ -4,7 +4,7 @@
     <endpoint name="LicGen"
               service="{urn:keygenerator.webservice.external.flexnet.com}LicenseGeneratorService"
               port="{urn:keygenerator.webservice.external.flexnet.com}LicenseGeneratorServicePort"
-              implementation="com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceImpl"
+              implementation="com.revenera.gcs.webservices.LicenseGeneratorServiceImpl"
               url-pattern="/services/LicenseGeneratorService"/>
 
 </endpoints>

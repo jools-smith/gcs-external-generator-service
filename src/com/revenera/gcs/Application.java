@@ -2,6 +2,7 @@ package com.revenera.gcs;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.GeneratorImplementor;
+import com.revenera.gcs.implementor.ServiceImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.Loggable;
@@ -85,7 +86,7 @@ public class Application extends Loggable implements ServletContextListener {
     try (final ExecutionContext ctx = new ExecutionContext()) {
       try {
         while (ExecutionContext.getTransactionManager().hasTransactions()) {
-          //TODO:need to depopulate the queue even if not serializing
+          //need to depopulate the queue even if not serializing
           final Map.Entry<Object, Object> content = ExecutionContext.getTransactionManager().pollTransactions();
 
           if (content != null) {
@@ -183,6 +184,11 @@ public class Application extends Loggable implements ServletContextListener {
                 annotation.technologyName(),
                 type.getSimpleName());
           }
+        }
+        else if (type.isAnnotationPresent(ServiceImplementor.class)) {
+          final ServiceImplementor annotation = type.getAnnotation(ServiceImplementor.class);
+
+          logger.get().info("found service implementor {0}", annotation.serviceName());
         }
       }
 

@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ImplementorFactory extends Loggable implements ImplementorManagement {
-//  private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
 
   private final List<TechnologyProperties> implementors = new ArrayList<>();
 

@@ -4,6 +4,7 @@ import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.logging.LoggingManager;
 import com.revenera.gcs.transaction.DiagnosticsFactory;
+import com.revenera.gcs.webservices.ServiceManager;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ public class Beans {
   final static ApplicationProperties applicationProperties;
   final static ImplementorFactory implementorFactory;
   final static DiagnosticsFactory diagnosticsFactory;
+  final static ServiceManager serviceManager;
   final static LoggingManager loggingManager;
 
   static String web_inf;
@@ -26,6 +28,8 @@ public class Beans {
       applicationProperties = new ApplicationProperties();
       implementorFactory = new ImplementorFactory();
       diagnosticsFactory = new DiagnosticsFactory();
+      serviceManager = new ServiceManager();
+
       stopwatch.start();
     }
     finally {

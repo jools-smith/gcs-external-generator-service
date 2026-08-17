@@ -7,6 +7,7 @@ import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
 import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.HandyBag;
+import com.revenera.gcs.webservices.ServiceManager;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -147,6 +148,10 @@ public class ExecutionContext implements AutoCloseable {
 
   public static LoggingManager getLoggingManager() {
     return Beans.loggingManager;
+  }
+
+  public static ServiceManager getServiceManager() {
+    return Beans.serviceManager;
   }
 
   public static Path getLogPath() {

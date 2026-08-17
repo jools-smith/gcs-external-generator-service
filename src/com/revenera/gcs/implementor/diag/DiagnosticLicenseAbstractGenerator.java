@@ -74,7 +74,7 @@ public final class DiagnosticLicenseAbstractGenerator extends AbstractGenerator 
 
   @Override
   public void registerConfirmation() {
-    logger.get().info("Registering Confirmation {0} {1} {2}", this.getClass().getSimpleName(), this.id, this.name);
+    logger.get().info("{0} {1} {2}", this.getClass().getSimpleName(), this.id, this.name);
   }
 }
 

@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 
 /**
@@ -28,8 +27,6 @@ import java.util.stream.Stream;
  */
 @WebListener
 public class Application extends Loggable implements ServletContextListener {
-
-//  private static final LoggingFactory logger = LoggingFactory.create(Application.class);
 
   static {
     //noinspection unused
@@ -142,10 +139,12 @@ public class Application extends Loggable implements ServletContextListener {
     final Enumeration<String> itt = event.getServletContext().getAttributeNames();
     while (itt.hasMoreElements()) {
       final String name = itt.nextElement();
+      //kludge
+      if (!name.equals("org.apache.catalina.jsp_classpath")) {
+        final Object value = event.getServletContext().getAttribute(name);
 
-      final Object value = event.getServletContext().getAttribute(name);
-
-      logger.get().debug("{0} {1}", name, value != null ? value.toString() : "null");
+        logger.get().debug("{0} {1}", name, value != null ? value.toString() : "null");
+      }
     }
   }
 
@@ -153,11 +152,11 @@ public class Application extends Loggable implements ServletContextListener {
 
     final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-    logger.get().info("found id:{0} name:{1} default:{2} {3}",
-        annotation.technologyId(),
-        annotation.technologyName(),
-        annotation.isDefault(),
-        type.getSimpleName());
+//    logger.get().debug("found id:{0} name:{1} default:{2} {3}",
+//        annotation.technologyId(),
+//        annotation.technologyName(),
+//        annotation.isDefault(),
+//        type.getSimpleName());
 
     if (TechnologyProperties.class.isAssignableFrom(type)) {
 
@@ -183,13 +182,13 @@ public class Application extends Loggable implements ServletContextListener {
 
     final WebService annotation = type.getAnnotation(WebService.class);
 
-    logger.get().info("found service {0} {1} {2} {3} {4} {5}",
-        annotation.serviceName(),
-        annotation.endpointInterface(),
-        annotation.name(),
-        annotation.portName(),
-        annotation.targetNamespace(),
-        annotation.wsdlLocation());
+//    logger.get().debug("found service {0} {1} {2} {3} {4} {5}",
+//        annotation.serviceName(),
+//        annotation.endpointInterface(),
+//        annotation.name(),
+//        annotation.portName(),
+//        annotation.targetNamespace(),
+//        annotation.wsdlLocation());
 
     if (ServiceProperties.class.isAssignableFrom(type)) {
       final ServiceProperties serviceImplementor = (ServiceProperties) type.newInstance();
@@ -197,11 +196,13 @@ public class Application extends Loggable implements ServletContextListener {
       serviceImplementor.setImplementorName(annotation.name());
 
       serviceImplementor.setInterfaceName(annotation.endpointInterface());
+
+      ExecutionContext.getServiceManager().addService(serviceImplementor);
     }
   }
 
   private LicenseGeneratorServiceInterface configureImplementors() throws Exception {
-    logger.in();
+
     try (final AnnotationManager manager = new AnnotationManager()) {
 
       final List<String> files = manager.findClassFilesInPackage(Paths.get("com/revenera"));
@@ -218,6 +219,12 @@ public class Application extends Loggable implements ServletContextListener {
           continue;
         }
 
+        for (final Annotation ann : type.getAnnotations()) {
+          logger.get().info("{0}({1})",
+              ann.annotationType().getSimpleName(),
+              type.getSimpleName());
+        }
+
         if (type.isAnnotationPresent(GeneratorImplementor.class)) {
           processGeneratorImplementor(type);
           continue;
@@ -226,12 +233,6 @@ public class Application extends Loggable implements ServletContextListener {
         if (type.isAnnotationPresent(WebService.class)) {
           processServiceImplementor(type);
           continue;
-        }
-
-        for (final Annotation ann : type.getAnnotations()) {
-          logger.get().info("{0} has {1}",
-              type.getSimpleName(),
-              ann.annotationType().getSimpleName());
         }
       }
     }

@@ -2,22 +2,25 @@ package com.revenera.gcs;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.GeneratorImplementor;
-import com.revenera.gcs.implementor.ServiceImplementor;
 import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.logging.Level;
 import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.utils.Serializer;
+import com.revenera.gcs.webservices.ServiceProperties;
 import org.apache.commons.io.FileUtils;
 
+import javax.jws.WebService;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 
 /**
@@ -146,6 +149,57 @@ public class Application extends Loggable implements ServletContextListener {
     }
   }
 
+  private void processGeneratorImplementor(final Class<?> type) throws InstantiationException, IllegalAccessException {
+
+    final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
+
+    logger.get().info("found id:{0} name:{1} default:{2} {3}",
+        annotation.technologyId(),
+        annotation.technologyName(),
+        annotation.isDefault(),
+        type.getSimpleName());
+
+    if (TechnologyProperties.class.isAssignableFrom(type)) {
+
+      final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
+
+      // set up properties from the annotations
+      technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
+
+      ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
+
+      // let the implementor know it's been registered
+      technologyImplementor.registerConfirmation();
+    }
+    else {
+      logger.get().warn("invalid id:{0} name:{1} {2}",
+          annotation.technologyId(),
+          annotation.technologyName(),
+          type.getSimpleName());
+    }
+  }
+
+  private void processServiceImplementor(final Class<?> type) throws InstantiationException, IllegalAccessException {
+
+    final WebService annotation = type.getAnnotation(WebService.class);
+
+    logger.get().info("found service {0} {1} {2} {3} {4} {5}",
+        annotation.serviceName(),
+        annotation.endpointInterface(),
+        annotation.name(),
+        annotation.portName(),
+        annotation.targetNamespace(),
+        annotation.wsdlLocation());
+
+    if (ServiceProperties.class.isAssignableFrom(type)) {
+      final ServiceProperties serviceImplementor = (ServiceProperties) type.newInstance();
+
+      serviceImplementor.setImplementorName(annotation.name());
+
+      serviceImplementor.setInterfaceName(annotation.endpointInterface());
+    }
+  }
+
   private LicenseGeneratorServiceInterface configureImplementors() throws Exception {
     logger.in();
     try (final AnnotationManager manager = new AnnotationManager()) {
@@ -156,45 +210,35 @@ public class Application extends Loggable implements ServletContextListener {
 
         final Class<?> type = Class.forName(typename);
 
-        if (type.isAnnotationPresent(GeneratorImplementor.class)) {
-
-          final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
-
-          logger.get().info("found id:{0} name:{1} default:{2} {3}",
-              annotation.technologyId(),
-              annotation.technologyName(),
-              annotation.isDefault(),
-              type.getSimpleName());
-
-          if (TechnologyProperties.class.isAssignableFrom(type)) {
-
-            final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();
-
-            // set up properties from the annotations
-            technologyImplementor.configureTechnologyProperties(annotation.technologyId(), annotation.technologyName());
-
-            ExecutionContext.getImplementorFactory().addImplementor(technologyImplementor, annotation.isDefault());
-
-            // let the implementor know it's been registered
-            technologyImplementor.registerConfirmation();
-          }
-          else {
-            logger.get().warn("invalid id:{0} name:{1} {2}",
-                annotation.technologyId(),
-                annotation.technologyName(),
-                type.getSimpleName());
-          }
+        if (type.isAnnotation()) {
+          continue;
         }
-        else if (type.isAnnotationPresent(ServiceImplementor.class)) {
-          final ServiceImplementor annotation = type.getAnnotation(ServiceImplementor.class);
 
-          logger.get().info("found service implementor {0}", annotation.serviceName());
+        if (type.isAnonymousClass()){
+          continue;
+        }
+
+        if (type.isAnnotationPresent(GeneratorImplementor.class)) {
+          processGeneratorImplementor(type);
+          continue;
+        }
+
+        if (type.isAnnotationPresent(WebService.class)) {
+          processServiceImplementor(type);
+          continue;
+        }
+
+        for (final Annotation ann : type.getAnnotations()) {
+          logger.get().info("{0} has {1}",
+              type.getSimpleName(),
+              ann.annotationType().getSimpleName());
         }
       }
+    }
 
-      return ExecutionContext.getImplementorFactory().getDefaultImplementor();
-    } // close annotation manager
-  }
+
+    return ExecutionContext.getImplementorFactory().getDefaultImplementor();
+  } // close annotation manager
 
   private void configureHousekeeping() {
     logger.in();

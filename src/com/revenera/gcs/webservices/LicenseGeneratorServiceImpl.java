@@ -4,19 +4,15 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.ExecutionContext;
-import com.revenera.gcs.implementor.ServiceImplementor;
-import com.revenera.gcs.logging.Loggable;
 
 import javax.jws.WebService;
 
-
 @WebService(
     serviceName = "revenera-gcs",
+    name = "License Generator Service",
     endpointInterface = "com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface",
-    wsdlLocation = "WEB-INF/wsdl/schema/LicenseGeneratorService.wsdl"
-)
-@ServiceImplementor(serviceName = "LicenseGeneratorService")
-public class LicenseGeneratorServiceImpl extends Loggable implements LicenseGeneratorServiceInterface {
+    wsdlLocation = "WEB-INF/wsdl/schema/LicenseGeneratorService.wsdl")
+public class LicenseGeneratorServiceImpl extends ServiceProperties implements LicenseGeneratorServiceInterface {
 
   @Override
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {

@@ -156,12 +156,6 @@ public class Application extends Loggable implements ServletContextListener {
 
     final GeneratorImplementor annotation = type.getAnnotation(GeneratorImplementor.class);
 
-//    logger.get().debug("found id:{0} name:{1} default:{2} {3}",
-//        annotation.technologyId(),
-//        annotation.technologyName(),
-//        annotation.isDefault(),
-//        type.getSimpleName());
-
     if (TechnologyProperties.class.isAssignableFrom(type)) {
 
       final TechnologyProperties technologyImplementor = (TechnologyProperties) type.newInstance();

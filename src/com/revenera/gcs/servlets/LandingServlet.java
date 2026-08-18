@@ -4,6 +4,7 @@ import com.revenera.gcs.ApplicationProperties;
 import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.logging.LoggingFactory;
 import com.revenera.gcs.transaction.ExecutionRecord;
+import com.revenera.gcs.utils.Utils;
 import com.revenera.gcs.webservices.ServiceProperties;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -104,11 +105,11 @@ public class LandingServlet extends HttpServlet {
       "        <table>\n" +
       "            <tr><th>Application</th><td>Revenera Licence Generation Service</td></tr>\n" +
       "            <tr><th>Version</th><td>{1}.{2}</td></tr>\n" +
-      "            <tr><th>Release Date</th><td>{3} &nbsp;{4}</td></tr>\n" +
+      "            <tr><th>Release Date</th><td>{3}&nbsp;&nbsp;{4}</td></tr>\n" +
       "            <tr><th>Build Number</th><td>{5}</td></tr>\n" +
-      "            <tr><th>Environment</th><td>{6} &nbsp;({7} &nbsp;{8})</td></tr>\n" +
-      "            <tr><th>Status</th><td><spanclass=\"status\">{9} &nbsp;{10}</span></td></tr>\n" +
-      "            <tr><th>Java Runtime</th><td>{11} &nbsp;{12} &nbsp;({13})</td></tr>\n" +
+      "            <tr><th>Environment</th><td>{6}&nbsp;&nbsp;({7}&nbsp;&nbsp;{8})</td></tr>\n" +
+      "            <tr><th>Status</th><td><spanclass=\"status\">{9}&nbsp;&nbsp;{10}</span></td></tr>\n" +
+      "            <tr><th>Java Runtime</th><td>{11}&nbsp;&nbsp;{12}&nbsp;&nbsp;({13})</td></tr>\n" +
       "            <tr><th>Technologies</th><td>{14}</td></tr>\n" +
       "            <tr><th>Services</th><td>{15}</td></tr>\n" +
       "            <tr><th>Diagnostics</th>\n"+
@@ -139,6 +140,8 @@ public class LandingServlet extends HttpServlet {
         .replace(">", "&gt;");
   }
 
+
+
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     //noinspection unused
@@ -167,7 +170,7 @@ public class LandingServlet extends HttpServlet {
 
           SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH,
 
-          SystemUtils.getHostName(), ExecutionContext.getApplicationDuration().toString(),
+          SystemUtils.getHostName(), Utils.prettyPrintDuration(ExecutionContext.getApplicationDuration()),
 
           SystemUtils.JAVA_VM_NAME, SystemUtils.JAVA_VERSION, SystemUtils.JAVA_CLASS_VERSION,
 

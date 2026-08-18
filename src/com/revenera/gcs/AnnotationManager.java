@@ -1,6 +1,7 @@
 package com.revenera.gcs;
 
 import com.revenera.gcs.logging.Loggable;
+import com.revenera.gcs.utils.AutoClose;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@AutoClose
 public class AnnotationManager extends Loggable implements AutoCloseable {
 
   static final String class_suffix = ".class";

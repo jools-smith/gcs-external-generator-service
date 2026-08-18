@@ -5,8 +5,10 @@ import com.revenera.gcs.logging.LoggingManager;
 import com.revenera.gcs.transaction.ExecutionManagement;
 import com.revenera.gcs.transaction.ExecutionRecord;
 import com.revenera.gcs.transaction.TransactionManagement;
+import com.revenera.gcs.utils.AutoClose;
 import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.HandyBag;
+import com.revenera.gcs.utils.Utils;
 import com.revenera.gcs.webservices.ServiceManager;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
@@ -14,9 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 class DataObject {
@@ -52,6 +52,7 @@ class Transaction {
   }
 }
 
+@AutoClose
 public class ExecutionContext implements AutoCloseable {
 
   static final ThreadLocal<LinkedList<Transaction>> context = new ThreadLocal<>();
@@ -193,7 +194,7 @@ public class ExecutionContext implements AutoCloseable {
 
         .beginSection("system")
         .with("timestamp", Instant.now().toString())
-        .with("up_time", Beans.stopwatch.getDuration().toString())
+        .with("up_time", Utils.prettyPrintDuration(Beans.stopwatch.getDuration()))
         .with("user_name", SystemProperties.getUserName("unknown"))
         .with("host_name", SystemUtils.getHostName())
         .with("resource_path", Beans.getResourcePath().toAbsolutePath().toString())

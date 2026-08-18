@@ -186,14 +186,6 @@ public class Application extends Loggable implements ServletContextListener {
 
     final WebService annotation = type.getAnnotation(WebService.class);
 
-//    logger.get().debug("found service {0} {1} {2} {3} {4} {5}",
-//        annotation.serviceName(),
-//        annotation.endpointInterface(),
-//        annotation.name(),
-//        annotation.portName(),
-//        annotation.targetNamespace(),
-//        annotation.wsdlLocation());
-
     if (ServiceProperties.class.isAssignableFrom(type)) {
       final ServiceProperties serviceImplementor = (ServiceProperties) type.newInstance();
 

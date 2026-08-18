@@ -1,9 +1,12 @@
 package com.revenera.gcs.webservices;
 
 public interface ServiceImplementor {
-  String getInterfaceName();
-  void setInterfaceName(String interfaceName);
 
-  String getImplementorName();
-  void setImplementorName(String implementorName);
+  void set(String serviceName, String localName, String endpointName);
+
+  String getServiceName();
+
+  String getLocalName();
+
+  String getEndpointName();
 }

@@ -5,7 +5,6 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.implementor.AbstractGenerator;
 import com.revenera.gcs.implementor.GeneratorImplementor;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.Collections;
 
@@ -79,21 +78,21 @@ public class NO_LicenseAbstractGenerator extends AbstractGenerator implements Li
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateConsolidatedLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateCustomHostIdentifier");
+    return throwNotImplementedException();
   }
 
   @Override

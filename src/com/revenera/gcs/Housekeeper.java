@@ -36,14 +36,14 @@ public class  Housekeeper extends Loggable {
   }
 
   void start(final Object id, final Runnable command, final int delay, final int period, final TimeUnit units) {
-    logger.get().info("starting", id.toString(), delay, period, units);
+    logger.get().info("starting {0} {1} {2} {3}", id.toString(), delay, period, units);
 
     runners.put(id, this.scheduler.scheduleAtFixedRate(command, delay, period, units));
   }
 
   void cancel(final Object id) {
     try {
-      logger.get().info("cancelling", id.toString());
+      logger.get().info("cancelling {0}", id.toString());
 
       runners.get(id).cancel(false);
     }

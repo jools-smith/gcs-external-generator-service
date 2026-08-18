@@ -5,7 +5,6 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.ExecutionContext;
 import com.revenera.gcs.implementor.AbstractGenerator;
 import com.revenera.gcs.implementor.GeneratorImplementor;
-import org.apache.commons.lang3.NotImplementedException;
 
 @SuppressWarnings("unused")
 @GeneratorImplementor(technologyId = "DEF", technologyName = "Unimplemented License Technology", isDefault = true)
@@ -41,35 +40,35 @@ public final class DiagnosticLicenseAbstractGenerator extends AbstractGenerator 
   public GeneratorResponse generateLicense(GeneratorRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateLicense");
+    return throwNotImplementedException();
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("consolidateFulfillments");
+    return throwNotImplementedException();
   }
 
   @Override
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateConsolidatedLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateCustomHostIdentifier");
+    return throwNotImplementedException();
   }
 
   @Override

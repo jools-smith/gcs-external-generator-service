@@ -3,6 +3,7 @@ package com.revenera.gcs.implementor;
 import com.flexnet.external.type.*;
 import com.revenera.gcs.Beans;
 import com.revenera.gcs.ExecutionContext;
+import com.revenera.gcs.utils.Frame;
 import com.revenera.gcs.utils.HandyBag;
 import com.revenera.gcs.utils.Serializer;
 import org.apache.commons.lang3.SystemProperties;
@@ -90,5 +91,10 @@ public abstract class AbstractGenerator extends AbstractTechnology {
         this.code = 0;
       }
     };
+  }
+
+  protected <T> T throwNotImplementedException() {
+    final Frame frame = new Frame(Frame.Depth.TWO);
+    throw new RuntimeException("not implemented " + frame.getMethodName());
   }
 }

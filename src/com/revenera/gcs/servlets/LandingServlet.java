@@ -174,7 +174,7 @@ public class LandingServlet extends HttpServlet {
           String.join("&nbsp;|&nbsp;", ExecutionContext.getImplementorFactory().getImplementors()),
 
           ExecutionContext.getServiceManager().getServices().stream()
-              .map(ServiceProperties::getImplementorName)
+              .map(ServiceProperties::getLocalName)
               .collect(Collectors.joining("&nbsp;|&nbsp;")),
 
           diag

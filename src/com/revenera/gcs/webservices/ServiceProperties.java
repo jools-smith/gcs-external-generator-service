@@ -3,26 +3,29 @@ package com.revenera.gcs.webservices;
 import com.revenera.gcs.logging.Loggable;
 
 public class ServiceProperties extends Loggable implements ServiceImplementor {
-  String interfaceName;
-  String implementor;
-  
+  String serviceName;
+  String localName;
+  String endpointName;
+
   @Override
-  public String getInterfaceName() {
-    return this.interfaceName;
+  public void set(String serviceName, String localName, String endpointName) {
+    this.serviceName = serviceName;
+    this.localName = localName;
+    this.endpointName = endpointName;
   }
 
   @Override
-  public void setInterfaceName(final String value) {
-    this.interfaceName = value;
+  public String getServiceName() {
+    return this.serviceName;
   }
 
   @Override
-  public String getImplementorName() {
-    return this.implementor;
+  public String getLocalName() {
+    return this.localName;
   }
 
   @Override
-  public void setImplementorName(final String value) {
-    this.implementor =  value;
+  public String getEndpointName() {
+    return this.endpointName;
   }
 }

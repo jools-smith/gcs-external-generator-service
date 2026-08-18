@@ -121,7 +121,7 @@
         <!-- this copy works -->
         <echo file="${build}/revenera.properties">
 build.version.major=4
-build.version.minor=0
+build.version.minor=1
 build.number=${build.number}
 build.timestamp=${build.timestamp}
 build.date=${build.date}
@@ -130,7 +130,7 @@ build.category=GA
 build.username=${user.name}
 app.logging.level=ALL
 app.logging.echo=ON
-app.housekeeping=10
+app.housekeeping=15
         </echo>
     </target>
 

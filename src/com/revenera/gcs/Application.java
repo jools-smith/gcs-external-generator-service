@@ -8,6 +8,8 @@ import com.revenera.gcs.logging.Loggable;
 import com.revenera.gcs.utils.Serializer;
 import com.revenera.gcs.webservices.ServiceProperties;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jws.WebService;
 import javax.servlet.ServletContextEvent;
@@ -27,6 +29,8 @@ import java.util.concurrent.TimeUnit;
  */
 @WebListener
 public class Application extends Loggable implements ServletContextListener {
+
+  private static final Logger log = LoggerFactory.getLogger(Application.class);
 
   static {
     //noinspection unused
@@ -193,9 +197,10 @@ public class Application extends Loggable implements ServletContextListener {
     if (ServiceProperties.class.isAssignableFrom(type)) {
       final ServiceProperties serviceImplementor = (ServiceProperties) type.newInstance();
 
-      serviceImplementor.setImplementorName(annotation.name());
-
-      serviceImplementor.setInterfaceName(annotation.endpointInterface());
+      serviceImplementor.set(
+          annotation.serviceName(),
+          annotation.name(),
+          annotation.endpointInterface());
 
       ExecutionContext.getServiceManager().addService(serviceImplementor);
     }

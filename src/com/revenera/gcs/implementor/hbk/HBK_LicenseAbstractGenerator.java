@@ -7,7 +7,6 @@ import com.revenera.gcs.implementor.AbstractGenerator;
 import com.revenera.gcs.implementor.GeneratorImplementor;
 import com.revenera.gcs.implementor.GeneratorResources;
 import com.revenera.gcs.utils.Serializer;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
@@ -203,21 +202,21 @@ public class HBK_LicenseAbstractGenerator extends AbstractGenerator implements L
   public LicenseFileDefinitionMap generateLicenseFilenames(final GeneratorRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public LicenseFileDefinitionMap generateConsolidatedLicenseFilenames(final ConsolidatedLicenseResquest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateConsolidatedLicenseFilenames");
+    return throwNotImplementedException();
   }
 
   @Override
   public String generateCustomHostIdentifier(final HostIdRequest request) {
     ExecutionContext.injectRequest(request);
 
-    throw new NotImplementedException("generateCustomHostIdentifier");
+    return throwNotImplementedException();
   }
 
   @Override

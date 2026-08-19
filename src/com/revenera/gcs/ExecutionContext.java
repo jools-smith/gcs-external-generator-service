@@ -14,6 +14,7 @@ import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -172,53 +173,56 @@ public class ExecutionContext implements AutoCloseable {
     return bag;
   }
 
+  final static Function<Long, String> toMegaBytes = v -> MessageFormat.format("{0}MB", (v / 1024 / 1024));
+
   public static HandyBag getApplicationData() {
-    final ApplicationProperties bv = getApplicationProperties();
+    final ApplicationProperties props = getApplicationProperties();
 
     final Runtime runtime = Runtime.getRuntime();
 
-    final Function<Long, String> tomb = v -> (v / (1024 * 1024)) + "MB";
-
     return new HandyBag()
         .beginSection("build")
-        .with("version", bv.getVersion())
-        .with("timestamp", bv.getTimestamp())
-        .with("date", bv.getReleaseDate())
-        .with("time", bv.getReleaseTime())
-        .with("release", bv.getRelease())
-        .with("user", bv.getUser())
-        .with("logging_level", bv.getLoggingLevel())
-        .with("housekeeping-frequency", bv.getHousekeepingFrequency())
-        .with("echo-log", bv.getLoggingEcho())
-        .endSection()
+        .with("version", MessageFormat.format("{0} {1}",
+            props.getVersion(),
+            props.getRelease()))
+        .with("date", MessageFormat.format("{0} {1}",
+            props.getReleaseDate(),
+            props.getReleaseTime()))
+        .with("user", MessageFormat.format("{0} at:{1}",
+            props.getUser(),
+            props.getTimestamp()))
 
-        .beginSection("system")
-        .with("timestamp", Instant.now().toString())
-        .with("up_time", Utils.prettyPrintDuration(Beans.stopwatch.getDuration()))
-        .with("user_name", SystemProperties.getUserName("unknown"))
-        .with("host_name", SystemUtils.getHostName())
-        .with("resource_path", Beans.getResourcePath().toAbsolutePath().toString())
-        .endSection()
+        .endSectionAndBegin("logging")
+        .with("level", props.getLoggingLevel())
+        .with("frequency", props.getHousekeepingFrequency())
+        .with("echo", props.getLoggingEcho())
 
-        .beginSection("memory")
+        .endSectionAndBegin("system")
+        .with("times", MessageFormat.format("{0} for:{1}",
+            Instant.now().toString(),
+            Utils.prettyPrintDuration(Beans.stopwatch.getDuration())))
+        .with("where", MessageFormat.format("{0} on:{1}",
+            SystemProperties.getUserName("unknown"),
+            SystemUtils.getHostName()))
+        .with("resource", Beans.getResourcePath().toAbsolutePath().toString())
+
+        .endSectionAndBegin("memory")
         .with("processors", runtime.availableProcessors())
-        .with("free_memory", tomb.apply(runtime.freeMemory()))
-        .with("total_memory", tomb.apply(runtime.totalMemory()))
-        .with("max_memory", tomb.apply(runtime.maxMemory()))
-        .endSection()
+        .with("free", toMegaBytes.apply(runtime.freeMemory()))
+        .with("total", toMegaBytes.apply(runtime.totalMemory()))
+        .with("max", toMegaBytes.apply(runtime.maxMemory()))
 
-        .beginSection("environment")
-        .with("os_name", SystemUtils.OS_NAME)
-        .with("os_version", SystemUtils.OS_VERSION)
-        .with("os_arch", SystemUtils.OS_ARCH)
-        .endSection()
+        .endSectionAndBegin("operating-system")
+        .with("name", SystemUtils.OS_NAME)
+        .with("version", SystemUtils.OS_VERSION)
+        .with("architecture", SystemUtils.OS_ARCH)
 
-        .beginSection("environment")
-        .with("java_version", SystemUtils.JAVA_VERSION)
-        .with("java_vendor", SystemUtils.JAVA_VENDOR)
-        .with("java_class_version", SystemUtils.JAVA_CLASS_VERSION)
-        .with("java_vm_name", SystemUtils.JAVA_VM_NAME)
-        .with("java_vm_info", SystemUtils.JAVA_VM_INFO)
+        .endSectionAndBegin("java")
+        .with("version", SystemUtils.JAVA_VERSION)
+        .with("vendor", SystemUtils.JAVA_VENDOR)
+        .with("class-version", SystemUtils.JAVA_CLASS_VERSION)
+        .with("vm-name", SystemUtils.JAVA_VM_NAME)
+        .with("vm-info", SystemUtils.JAVA_VM_INFO)
         .endSection()
 
         .with("diagnostics", getRecordsBag());

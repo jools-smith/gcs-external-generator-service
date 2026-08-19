@@ -61,6 +61,11 @@ public final class HandyBag extends LinkedHashMap<String, Object> {
     return this.parent;
   }
 
+  @JsonIgnore
+  public HandyBag endSectionAndBegin(final String key) {
+    return endSection().beginSection(key);
+  }
+
   @SuppressWarnings("unused")
   public Map<String, Object> getElements() {
     return this;
